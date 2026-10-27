@@ -1,0 +1,24 @@
+<%- include('partials/head', { title: t('news_title'), description: t('news_lead') }) %>
+
+<section class="page-hero">
+  <div class="container">
+    <h1 class="page-title"><%= t('news_title') %></h1>
+    <p class="lead"><%= t('news_lead') %></p>
+  </div>
+</section>
+
+<div class="container">
+  <div class="category-chips">
+    <a class="cat-chip<%= !kind ? ' is-active' : '' %>" href="<%= url('/news') %>"><%= t('news_all') %></a>
+    <% kinds.forEach(function (k) { %><a class="cat-chip<%= kind === k ? ' is-active' : '' %>" href="<%= url('/news') %>?kind=<%= k %>"><%= t('news_kind_' + k) %></a><% }) %>
+  </div>
+
+  <% if (news.length) { %>
+    <div class="card-grid card-grid--3"><% news.forEach(function (item) { %><%- include('partials/news-card', { item }) %><% }) %></div>
+    <%- include('partials/pagination', { query: kind ? { kind } : {} }) %>
+  <% } else { %>
+    <div class="empty-state"><%- icon('calendar') %><h3><%= t('news_empty') %></h3></div>
+  <% } %>
+</div>
+
+<%- include('partials/foot') %>

@@ -1,0 +1,95 @@
+<%- include('partials/head', { title: t('history_title'), description: t('history_lead') }) %>
+
+<section class="page-hero">
+  <div class="container">
+    <h1 class="page-title"><%= t('history_title') %></h1>
+    <p class="lead"><%= t('history_lead') %></p>
+  </div>
+</section>
+
+<div class="container history-layout">
+  <aside class="toc" aria-labelledby="toc-title">
+    <h2 class="toc__title" id="toc-title"><%= t('history_contents') %></h2>
+    <ol>
+      <% sections.forEach(function (s) { %><li><a href="#<%= s.slug %>"><%= p(s, 'title') %></a></li><% }) %>
+      <li><a href="#photos"><%= t('history_photos') %></a></li>
+      <li><a href="#memories"><%= t('history_memories') %></a></li>
+      <% if (documents.length || videos.length) { %><li><a href="#archive"><%= t('history_documents') %></a></li><% } %>
+    </ol>
+  </aside>
+
+  <div class="history-content">
+    <% sections.forEach(function (s, i) { const body = p(s, 'body'); const own = s['body_' + lang]; %>
+    <section class="history-section" id="<%= s.slug %>">
+      <span class="history-section__num"><%= String(i + 1).padStart(2, '0') %></span>
+      <h2><%= p(s, 'title') %></h2>
+      <% if (body) { %>
+        <% if (!own) { %><p class="notice"><%- icon('info') %><%= t('no_translation') %></p><% } %>
+        <div class="prose"><%- paragraphs(body) %></div>
+      <% } else { %>
+        <div class="pending">
+          <%- icon('clock') %>
+          <div>
+            <strong><%= t('history_pending') %></strong>
+            <p><%= t('history_pending_text') %></p>
+          </div>
+        </div>
+      <% } %>
+    </section>
+    <% }) %>
+
+    <section class="history-section" id="photos">
+      <h2><%= t('history_photos') %></h2>
+      <% const past = photos.filter(m => m.era === 'past'); const present = photos.filter(m => m.era !== 'past'); %>
+      <% if (photos.length) { %>
+        <% if (past.length) { %><h3 class="subhead"><%= t('history_past') %></h3><%- include('partials/gallery', { photos: past }) %><% } %>
+        <% if (present.length) { %><h3 class="subhead"><%= t('history_present') %></h3><%- include('partials/gallery', { photos: present }) %><% } %>
+      <% } else { %>
+        <div class="pending"><%- icon('image') %><div><strong><%= t('history_photos_empty') %></strong><p><%= t('history_pending_text') %></p></div></div>
+      <% } %>
+    </section>
+
+    <section class="history-section" id="memories">
+      <h2><%= t('history_memories') %></h2>
+      <% if (memories.length) { %>
+        <div class="memories">
+          <% memories.forEach(function (m) { %>
+          <figure class="memory">
+            <%- icon('quote') %>
+            <blockquote><%- paragraphs(p(m, 'text')) %></blockquote>
+            <figcaption><strong><%= m.author %></strong><% if (m.year_label) { %> · <%= m.year_label %><% } %><% if (p(m, 'title')) { %><br><span><%= p(m, 'title') %></span><% } %></figcaption>
+          </figure>
+          <% }) %>
+        </div>
+      <% } else { %>
+        <div class="pending"><%- icon('quote') %><div><p><%= t('history_memories_empty') %></p></div></div>
+      <% } %>
+    </section>
+
+    <% if (documents.length || videos.length) { %>
+    <section class="history-section" id="archive">
+      <h2><%= t('history_documents') %></h2>
+      <ul class="doc-list">
+        <% documents.concat(videos).forEach(function (d) { %>
+        <li>
+          <%- icon(d.kind === 'video' ? 'video' : 'file') %>
+          <div><strong><%= p(d, 'title') || d.file.split('/').pop() %></strong><% if (d.year_label) { %> <span class="meta"><%= d.year_label %></span><% } %>
+          <% if (p(d, 'text')) { %><p><%= p(d, 'text') %></p><% } %></div>
+          <a class="btn btn--ghost btn--sm" href="<%= d.file || d.url %>" target="_blank" rel="noopener"><%= t('history_open') %></a>
+        </li>
+        <% }) %>
+      </ul>
+    </section>
+    <% } %>
+
+    <div class="cta-card">
+      <div>
+        <h2><%= t('history_share_btn') %></h2>
+        <p><%= t('history_pending_text') %></p>
+      </div>
+      <a class="btn btn--gold" href="<%= url('/contacts') %>#form"><%- icon('mail') %><%= t('history_share_btn') %></a>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/foot') %>

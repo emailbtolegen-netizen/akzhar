@@ -1,0 +1,17 @@
+<% const name = p(ph, 'name'); const note = p(ph, 'note'); %>
+<div class="phone-card<%= ph.phone ? '' : ' phone-card--empty' %>" data-phone-item data-search="<%= (ph.name_kk + ' ' + ph.name_ru + ' ' + ph.note_kk + ' ' + ph.note_ru + ' ' + ph.phone + ' ' + ph.phone2).toLocaleLowerCase('ru') %>">
+  <span class="phone-card__icon"><%- icon(ph.icon) %></span>
+  <div class="phone-card__info">
+    <h3 class="phone-card__name"><%= name %></h3>
+    <% if (note) { %><p class="phone-card__note"><%= note %></p><% } %>
+    <% if (ph.phone) { %>
+      <a class="phone-card__number" href="<%= phoneHref(ph.phone) %>"><%= phoneDisplay(ph.phone) %></a>
+      <% if (ph.phone2) { %><a class="phone-card__number" href="<%= phoneHref(ph.phone2) %>"><%= phoneDisplay(ph.phone2) %></a><% } %>
+    <% } else { %>
+      <p class="phone-card__missing"><%= t('phones_missing') %></p>
+    <% } %>
+  </div>
+  <% if (ph.phone) { %>
+  <a class="phone-card__call" href="<%= phoneHref(ph.phone) %>" aria-label="<%= t('phones_call') %>: <%= name %>"><%- icon('phone') %><span><%= t('phones_call') %></span></a>
+  <% } %>
+</div>

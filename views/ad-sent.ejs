@@ -1,0 +1,13 @@
+<%- include('partials/head', { title: t('form_sent_title') }) %>
+<div class="container form-wrap">
+  <div class="empty-state empty-state--ok">
+    <%- icon('check') %>
+    <h1><%= t('form_sent_title') %></h1>
+    <p><%= auto ? t('form_sent_auto') : t('form_sent_text') %></p>
+    <div class="btn-row">
+      <% if (auto) { %><a class="btn btn--primary" href="<%= url('/ads/' + id) %>"><%= t('ads_details') %></a><% } %>
+      <a class="btn btn--ghost" href="<%= url('/ads') %>"><%= t('ads_back') %></a>
+    </div>
+  </div>
+</div>
+<%- include('partials/foot') %>

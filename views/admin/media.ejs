@@ -1,0 +1,19 @@
+<%- include('_head', { title: 'Фото и видео', active: '/admin/media' }) %>
+<div class="admin-head">
+  <h1>Фото, видео и материалы</h1>
+  <a class="btn btn--primary" href="/admin/media/new?section=<%= section %>"><%- icon('plus') %>Добавить</a>
+</div>
+<nav class="tabs">
+  <% sections.forEach(function (s) { %><a href="?section=<%= s[0] %>"<%= section === s[0] ? ' aria-current="page"' : '' %>><%= s[1] %></a><% }) %>
+</nav>
+<div class="media-grid">
+  <% media.forEach(function (m) { const f = m.file || ''; %>
+  <a class="card media-tile" href="/admin/media/<%= m.id %>">
+    <% if (/\.(jpe?g|png|webp)$/i.test(f)) { %><img src="<%= f %>" alt="" loading="lazy">
+    <% } else { %><span class="media-tile__icon"><%- icon(m.kind === 'video' ? 'video' : m.kind === 'memory' ? 'quote' : 'file') %></span><% } %>
+    <span class="media-tile__cap"><strong><%= kinds[m.kind] %></strong><%= m.title_ru || m.title_kk || m.author || f.split('/').pop() || m.url %><% if (m.era === 'past') { %> · прошлое<% } %></span>
+  </a>
+  <% }) %>
+  <% if (!media.length) { %><p class="muted">Материалов пока нет.</p><% } %>
+</div>
+<%- include('_foot') %>

@@ -1,0 +1,14 @@
+<%- include('_head', { title: 'Интересные места', active: '/admin/places' }) %>
+<div class="admin-head">
+  <h1>Интересные места</h1>
+  <a class="btn btn--primary" href="/admin/places/new"><%- icon('plus') %>Добавить место</a>
+</div>
+<div class="media-grid">
+  <% places.forEach(function (p) { %>
+  <a class="card media-tile" href="/admin/places/<%= p.id %>">
+    <% if (p.image) { %><img src="<%= p.image %>" alt="" loading="lazy"><% } else { %><span class="media-tile__icon"><%- icon('pin') %></span><% } %>
+    <span class="media-tile__cap"><strong><%= p.name_ru %></strong><%= p.text_ru ? excerpt(p.text_ru, 60) : 'Описание не заполнено' %></span>
+  </a>
+  <% }) %>
+</div>
+<%- include('_foot') %>

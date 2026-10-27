@@ -1,0 +1,9 @@
+<% if (pages > 1) {
+  const link = (n) => { const q = new URLSearchParams(query); q.set('page', n); return '?' + q.toString(); };
+%>
+<nav class="pagination" aria-label="<%= t('page') %>">
+  <% if (pageNo > 1) { %><a class="btn btn--ghost btn--sm" href="<%= link(pageNo - 1) %>"><%- icon('arrowLeft') %><%= t('prev') %></a><% } %>
+  <span><%= t('page') %> <%= pageNo %> / <%= pages %></span>
+  <% if (pageNo < pages) { %><a class="btn btn--ghost btn--sm" href="<%= link(pageNo + 1) %>"><%= t('next') %><%- icon('arrow') %></a><% } %>
+</nav>
+<% } %>

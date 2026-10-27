@@ -1,0 +1,13 @@
+<%- include('_head', { title: 'Вход' }) %>
+<form class="form card login-card" method="post" action="/admin/login">
+  <img src="/img/logo.svg" alt="" width="56" height="56">
+  <h1 class="form__title">Вход в панель управления</h1>
+  <% if (error) { %><p class="notice notice--error" role="alert"><%- icon('alert') %><%= error %></p><% } %>
+  <% if (noUsers) { %><p class="notice notice--warn"><%- icon('info') %><span>Пользователей еще нет. Создайте администратора командой<br><code>npm run create-admin -- логин пароль</code></span></p><% } %>
+  <input type="hidden" name="next" value="<%= next %>">
+  <div class="field"><label for="u">Логин</label><input id="u" name="username" autocomplete="username" required autofocus></div>
+  <div class="field"><label for="pw">Пароль</label><input id="pw" name="password" type="password" autocomplete="current-password" required></div>
+  <button class="btn btn--primary btn--lg" type="submit">Войти</button>
+  <a href="/" class="muted">← На сайт</a>
+</form>
+<%- include('_foot') %>

@@ -1,0 +1,99 @@
+<%
+  const lat = parseFloat(settings.map_lat), lon = parseFloat(settings.map_lon);
+  const hasMap = Number.isFinite(lat) && Number.isFinite(lon);
+  const d = 0.025;
+  const mapSrc = hasMap ? `https://www.openstreetmap.org/export/embed.html?bbox=${lon - d * 1.6},${lat - d},${lon + d * 1.6},${lat + d}&layer=mapnik&marker=${lat},${lon}` : '';
+  const mapLink = hasMap ? `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=14/${lat}/${lon}` : `https://www.openstreetmap.org/search?query=${encodeURIComponent('Ақжар, Атырау облысы')}`;
+%>
+<%- include('partials/head', { title: t('about_title'), description: t('about_lead') }) %>
+
+<section class="page-hero">
+  <div class="container">
+    <h1 class="page-title"><%= t('about_title') %></h1>
+    <p class="lead"><%= t('about_lead') %></p>
+  </div>
+</section>
+
+<div class="container about">
+  <section class="about-grid" aria-labelledby="loc">
+    <div class="card about-card">
+      <h2 id="loc"><%- icon('pin') %><%= t('about_location') %></h2>
+      <p class="about-card__big"><%= p(settings, 'site_name') %>, <%= p(settings, 'region') %></p>
+      <% if (p(settings, 'location')) { %><div class="prose"><%- paragraphs(p(settings, 'location')) %></div>
+      <% } else { %><p class="muted"><%= t('data_pending') %></p><% } %>
+    </div>
+    <div class="card about-card about-card--map">
+      <h2><%- icon('pin') %><%= t('about_map') %></h2>
+      <% if (hasMap) { %>
+        <div class="map-frame"><iframe src="<%= mapSrc %>" title="<%= t('about_map') %>" loading="lazy"></iframe></div>
+      <% } else { %>
+        <div class="pending"><%- icon('pin') %><div><p><%= t('about_map_pending') %></p></div></div>
+      <% } %>
+      <a class="btn btn--ghost btn--sm" href="<%= mapLink %>" target="_blank" rel="noopener"><%- icon('external') %><%= t('about_map_open') %></a>
+    </div>
+  </section>
+
+  <section class="section section--flush" aria-labelledby="infra">
+    <h2 class="section-title section-title--sm" id="infra"><%= t('about_infra') %></h2>
+    <ul class="infra-list">
+      <% institutions.forEach(function (i) { %>
+      <li><a href="<%= url('/phones') %>"><span class="infra-list__icon"><%- icon(i.icon) %></span><span><%= p(i, 'name') %></span></a></li>
+      <% }) %>
+    </ul>
+  </section>
+
+  <% if (photos.length) { %>
+  <section class="section section--flush" id="gallery" aria-labelledby="gal">
+    <h2 class="section-title section-title--sm" id="gal"><%= t('about_gallery') %></h2>
+    <%- include('partials/gallery', { photos }) %>
+  </section>
+  <% } %>
+
+  <section class="section section--flush" aria-labelledby="vids">
+    <h2 class="section-title section-title--sm" id="vids"><%= t('about_videos') %></h2>
+    <div class="video-grid">
+      <% if (settings.full_video) { %>
+      <figure class="video-card">
+        <video controls playsinline preload="none" poster="<%= settings.hero_poster %>"><source src="<%= settings.full_video %>" type="video/mp4"></video>
+        <figcaption><%= lang === 'kk' ? 'Ақжар — дроннан түсірілген' : 'Акжар — съемка с дрона' %></figcaption>
+      </figure>
+      <% } %>
+      <% videos.forEach(function (v) { const e = embedUrl(v.url); %>
+      <figure class="video-card">
+        <% if (v.file) { %><video controls playsinline preload="none"><source src="<%= v.file %>"></video>
+        <% } else if (e) { %><div class="video-card__embed"><iframe src="<%= e.replace('autoplay=1', 'autoplay=0') %>" title="<%= p(v, 'title') %>" loading="lazy" allowfullscreen></iframe></div>
+        <% } else { %><a class="btn btn--ghost" href="<%= v.url %>" target="_blank" rel="noopener"><%- icon('external') %><%= t('hero_open_original') %></a><% } %>
+        <figcaption><%= p(v, 'title') %></figcaption>
+      </figure>
+      <% }) %>
+    </div>
+  </section>
+
+  <section class="section section--flush" aria-labelledby="places">
+    <h2 class="section-title section-title--sm" id="places"><%= t('about_places') %></h2>
+    <% if (places.length) { %>
+    <div class="card-grid card-grid--3">
+      <% places.forEach(function (pl) { %>
+      <article class="card place-card">
+        <% if (pl.image) { %><img src="<%= pl.image %>" alt="" loading="lazy"><% } %>
+        <div class="place-card__body"><h3><%= p(pl, 'name') %></h3><div class="prose"><%- paragraphs(p(pl, 'text')) %></div></div>
+      </article>
+      <% }) %>
+    </div>
+    <% } else { %>
+      <div class="pending"><%- icon('pin') %><div><p><%= t('about_places_empty') %></p></div></div>
+    <% } %>
+  </section>
+
+  <section class="section section--flush" aria-labelledby="useful">
+    <h2 class="section-title section-title--sm" id="useful"><%= t('about_useful') %></h2>
+    <ul class="useful-list">
+      <li><%- icon('phone') %><a href="<%= url('/phones') %>"><%= t('about_useful_1') %></a></li>
+      <li><%- icon('bolt') %><a href="<%= url('/news') %>?kind=outage"><%= t('about_useful_2') %></a></li>
+      <li><%- icon('megaphone') %><a href="<%= url('/ads') %>"><%= t('about_useful_3') %></a></li>
+      <li><%- icon('alert') %><a href="tel:112"><%= t('about_useful_4') %></a></li>
+    </ul>
+  </section>
+</div>
+
+<%- include('partials/foot') %>

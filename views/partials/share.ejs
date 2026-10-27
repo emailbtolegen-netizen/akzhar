@@ -1,0 +1,8 @@
+<% const shareUrl = baseUrl + '/' + lang + pathNoLang; %>
+<div class="share" data-share data-url="<%= shareUrl %>" data-title="<%= shareTitle %>" data-copied="<%= t('news_copied') %>">
+  <span class="share__label"><%- icon('share') %><%= t('news_share') %>:</span>
+  <a class="share__btn" href="https://wa.me/?text=<%= encodeURIComponent(shareTitle + ' ' + shareUrl) %>" target="_blank" rel="noopener">WhatsApp</a>
+  <a class="share__btn" href="https://t.me/share/url?url=<%= encodeURIComponent(shareUrl) %>&text=<%= encodeURIComponent(shareTitle) %>" target="_blank" rel="noopener">Telegram</a>
+  <button class="share__btn" type="button" data-copy><%- icon('link') %><%= t('news_copy') %></button>
+  <button class="share__btn share__native" type="button" data-native-share hidden><%- icon('share') %><%= t('news_share') %>…</button>
+</div>

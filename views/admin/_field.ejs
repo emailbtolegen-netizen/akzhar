@@ -1,0 +1,31 @@
+<%
+  const id = 'f-' + f.name;
+  const val = f.value == null ? '' : f.value;
+  const req = f.required ? ' required' : '';
+%>
+<div class="field<%= f.type === 'checkbox' ? ' field--check' : '' %>">
+<% if (f.type === 'checkbox') { %>
+  <label class="checkbox"><input type="checkbox" id="<%= id %>" name="<%= f.name %>" value="1"<%= Number(val) ? ' checked' : '' %>><span><%= f.label %></span></label>
+<% } else { %>
+  <label for="<%= id %>"><%= f.label %><% if (f.required) { %> <span class="req">*</span><% } %></label>
+  <% if (f.type === 'textarea') { %>
+    <textarea id="<%= id %>" name="<%= f.name %>" rows="<%= f.rows || 5 %>"<%= req %>><%= val %></textarea>
+  <% } else if (f.type === 'select') { %>
+    <select id="<%= id %>" name="<%= f.name %>"<%= req %>>
+      <% f.options.forEach(function (o) { %><option value="<%= o[0] %>"<%= String(val) === String(o[0]) ? ' selected' : '' %>><%= o[1] %></option><% }) %>
+    </select>
+  <% } else if (f.type === 'file') { %>
+    <% const cur = f.current || (f.currentKey && values && values[f.currentKey]); %>
+    <% if (cur) { %>
+      <div class="current-file">
+        <% if (/\.(jpe?g|png|webp)$/i.test(cur)) { %><img src="<%= cur %>" alt=""><% } else { %><a href="<%= cur %>" target="_blank"><%- icon('file') %><%= cur.split('/').pop() %></a><% } %>
+        <% if (!f.currentKey) { %><label class="checkbox"><input type="checkbox" name="remove_<%= f.name %>" value="1"><span>Удалить файл</span></label><% } %>
+      </div>
+    <% } %>
+    <input type="file" id="<%= id %>" name="<%= f.name %>"<% if (f.accept) { %> accept="<%= f.accept %>"<% } %><%= f.multiple ? ' multiple' : '' %>>
+  <% } else { %>
+    <input id="<%= id %>" name="<%= f.name %>" type="<%= f.type || 'text' %>" value="<%= val %>"<%= req %>>
+  <% } %>
+<% } %>
+<% if (f.hint) { %><p class="field__hint"><%= f.hint %></p><% } %>
+</div>

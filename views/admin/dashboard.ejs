@@ -1,0 +1,29 @@
+<%- include('_head', { title: 'Обзор', active: '/admin' }) %>
+<div class="admin-head"><h1>Здравствуйте, <%= user.username %>!</h1></div>
+
+<div class="stat-grid">
+  <% if (can('ads')) { %>
+  <a class="stat<%= stats.pending ? ' stat--attention' : '' %>" href="/admin/ads?status=pending"><strong><%= stats.pending %></strong><span>объявлений ждут проверки</span></a>
+  <a class="stat<%= stats.reports ? ' stat--danger' : '' %>" href="/admin/ads?status=reported"><strong><%= stats.reports %></strong><span>объявлений с жалобами</span></a>
+  <a class="stat" href="/admin/ads?status=approved"><strong><%= stats.live %></strong><span>опубликовано сейчас</span></a>
+  <% } %>
+  <% if (can('messages')) { %>
+  <a class="stat<%= stats.messages ? ' stat--attention' : '' %>" href="/admin/messages"><strong><%= stats.messages %></strong><span>новых сообщений</span></a>
+  <% } %>
+  <% if (can('news')) { %><a class="stat" href="/admin/news"><strong><%= stats.news %></strong><span>новостей</span></a><% } %>
+</div>
+
+<% if (can('phones') || can('history') || can('settings')) { %>
+<section class="card admin-card">
+  <h2>Что еще нужно заполнить</h2>
+  <ul class="todo">
+    <% if (stats.emptyPhones) { %><li><%- icon('phone') %><a href="/admin/phones"><%= stats.emptyPhones %> учреждений без номера телефона</a> — например, детский сад и участковый.</li><% } %>
+    <% if (stats.emptyHistory) { %><li><%- icon('book') %><a href="/admin/history"><%= stats.emptyHistory %> разделов истории без текста</a> — посетители видят «Раздел заполняется».</li><% } %>
+    <% if (stats.examples) { %><li><%- icon('info') %><a href="/admin/news">Есть демонстрационные новости с меткой «Пример»</a> — удалите их, когда опубликуете настоящие.</li><% } %>
+    <% if (!settings.map_lat) { %><li><%- icon('pin') %><a href="/admin/settings">Координаты карты не указаны</a> — карта на странице «О поселке» скрыта.</li><% } %>
+    <% if (!settings.contact_phone && !settings.contact_email) { %><li><%- icon('mail') %><a href="/admin/settings">Контакты сайта не указаны</a> — телефон или e-mail для связи.</li><% } %>
+    <% if (!settings.location_ru) { %><li><%- icon('pin') %><a href="/admin/settings">Описание расположения поселка</a> не заполнено.</li><% } %>
+  </ul>
+</section>
+<% } %>
+<%- include('_foot') %>

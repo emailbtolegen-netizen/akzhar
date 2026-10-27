@@ -1,0 +1,11 @@
+<% locals.page = '404'; %>
+<%- include('partials/head', { title: t('page_not_found'), page: '404' }) %>
+<div class="container form-wrap">
+  <div class="empty-state">
+    <%- icon('search') %>
+    <h1><%= t('page_not_found') %></h1>
+    <p><%= t('page_not_found_text') %></p>
+    <a class="btn btn--primary" href="<%= url() %>"><%= t('to_home') %></a>
+  </div>
+</div>
+<%- include('partials/foot') %>

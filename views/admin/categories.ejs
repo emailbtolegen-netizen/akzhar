@@ -1,0 +1,27 @@
+<%- include('_head', { title: 'Категории', active: '/admin/categories' }) %>
+<div class="admin-head"><h1>Категории объявлений</h1></div>
+<div class="cat-edit-list">
+  <% categories.concat([{ id: 0, name_kk: '', name_ru: '', icon: 'tag', has_price: 1, active: 1, sort: 99, n: 0 }]).forEach(function (c) { %>
+  <form class="card cat-edit" method="post" action="/admin/categories">
+    <input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="id" value="<%= c.id %>">
+    <% if (!c.id) { %><h2>Новая категория</h2><% } %>
+    <div class="form-row form-row--lang">
+      <div class="field"><label>Название (ҚАЗ)</label><input name="name_kk" value="<%= c.name_kk %>"></div>
+      <div class="field"><label>Название (РУС)</label><input name="name_ru" value="<%= c.name_ru %>"<%= c.id ? '' : ' required' %>></div>
+    </div>
+    <div class="cat-edit__row">
+      <div class="field"><label>Иконка</label>
+        <select name="icon"><% iconNames.forEach(function (i) { %><option<%= c.icon === i ? ' selected' : '' %>><%= i %></option><% }) %></select></div>
+      <div class="field"><label>Порядок</label><input name="sort" type="number" value="<%= c.sort %>"></div>
+      <label class="checkbox"><input type="checkbox" name="has_price" value="1"<%= c.has_price ? ' checked' : '' %>><span>Есть цена</span></label>
+      <label class="checkbox"><input type="checkbox" name="active" value="1"<%= c.active ? ' checked' : '' %>><span>Активна</span></label>
+      <span class="muted"><%= c.id ? c.n + ' объявл.' : '' %></span>
+      <button class="btn btn--primary btn--sm" type="submit"><%= c.id ? 'Сохранить' : 'Добавить' %></button>
+    </div>
+  </form>
+  <% if (c.id && !c.n) { %>
+  <form method="post" action="/admin/categories/<%= c.id %>/delete" data-confirm="Удалить категорию?" class="cat-del"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="linklike" type="submit">Удалить «<%= c.name_ru %>»</button></form>
+  <% } %>
+  <% }) %>
+</div>
+<%- include('_foot') %>

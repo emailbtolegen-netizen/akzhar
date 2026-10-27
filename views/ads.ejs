@@ -1,0 +1,57 @@
+<%- include('partials/head', { title: t('ads_title'), description: t('ads_lead') }) %>
+
+<section class="page-hero">
+  <div class="container page-hero__row">
+    <div>
+      <h1 class="page-title"><%= t('ads_title') %></h1>
+      <p class="lead"><%= t('ads_lead') %></p>
+    </div>
+    <a class="btn btn--gold btn--lg" href="<%= url('/ads/new') %>"><%- icon('plus') %><%= t('ads_new') %></a>
+  </div>
+</section>
+
+<div class="container">
+  <form class="filters" method="get" action="<%= url('/ads') %>" role="search">
+    <div class="filters__search">
+      <%- icon('search') %>
+      <label class="visually-hidden" for="q"><%= t('ads_search') %></label>
+      <input id="q" name="q" type="search" value="<%= q %>" placeholder="<%= t('ads_search') %>">
+    </div>
+    <label class="visually-hidden" for="cat"><%= t('ads_category') %></label>
+    <select id="cat" name="cat" data-autosubmit>
+      <option value=""><%= t('ads_all_categories') %></option>
+      <% categories.forEach(function (c) { %><option value="<%= c.slug %>"<%= cat === c.slug ? ' selected' : '' %>><%= p(c, 'name') %> (<%= c.n %>)</option><% }) %>
+    </select>
+    <label class="visually-hidden" for="sort"><%= t('ads_sort') %></label>
+    <select id="sort" name="sort" data-autosubmit>
+      <% [['new', 'ads_sort_new'], ['old', 'ads_sort_old'], ['price_asc', 'ads_sort_price_asc'], ['price_desc', 'ads_sort_price_desc']].forEach(function (s) { %>
+      <option value="<%= s[0] %>"<%= sort === s[0] ? ' selected' : '' %>><%= t(s[1]) %></option><% }) %>
+    </select>
+    <button class="btn btn--primary" type="submit"><%= t('ads_find') %></button>
+    <% if (q || cat || sort !== 'new') { %><a class="btn btn--ghost" href="<%= url('/ads') %>"><%= t('ads_reset') %></a><% } %>
+  </form>
+
+  <div class="category-chips" aria-label="<%= t('ads_category') %>">
+    <a class="cat-chip<%= !cat ? ' is-active' : '' %>" href="<%= url('/ads') %><%= q ? '?q=' + encodeURIComponent(q) : '' %>"><%= t('ads_all_categories') %></a>
+    <% categories.forEach(function (c) { const qs = new URLSearchParams({ cat: c.slug }); if (q) qs.set('q', q); %>
+    <a class="cat-chip<%= cat === c.slug ? ' is-active' : '' %>" href="<%= url('/ads') %>?<%= qs.toString() %>"><%- icon(c.icon) %><%= p(c, 'name') %><% if (c.n) { %> <span class="cat-chip__n"><%= c.n %></span><% } %></a>
+    <% }) %>
+  </div>
+
+  <% if (ads.length) { %>
+    <p class="result-count"><%= t('ads_found') %>: <strong><%= total %></strong></p>
+    <div class="card-grid card-grid--3"><% ads.forEach(function (ad) { %><%- include('partials/ad-card', { ad }) %><% }) %></div>
+    <%- include('partials/pagination', { query: { q, cat, sort } }) %>
+  <% } else if (anyAds) { %>
+    <div class="empty-state"><%- icon('search') %><h3><%= t('ads_nothing_found') %></h3><a class="btn btn--ghost" href="<%= url('/ads') %>"><%= t('ads_reset') %></a></div>
+  <% } else { %>
+    <div class="empty-state">
+      <%- icon('megaphone') %>
+      <h3><%= t('ads_empty') %></h3>
+      <p><%= t('ads_empty_text') %></p>
+      <a class="btn btn--primary" href="<%= url('/ads/new') %>"><%- icon('plus') %><%= t('ads_new') %></a>
+    </div>
+  <% } %>
+</div>
+
+<%- include('partials/foot') %>

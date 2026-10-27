@@ -1,0 +1,30 @@
+<%- include('_head', { title, active: backUrl.split('?')[0] }) %>
+<div class="admin-head">
+  <div>
+    <a class="back-link" href="<%= backUrl %>"><%- icon('arrowLeft') %>Назад</a>
+    <h1><%= title %></h1>
+  </div>
+  <% if (typeof viewUrl !== 'undefined' && viewUrl) { %><a class="btn btn--ghost btn--sm" href="<%= viewUrl %>" target="_blank"><%- icon('external') %>Посмотреть на сайте</a><% } %>
+</div>
+<% if (typeof hint !== 'undefined' && hint) { %><p class="notice"><%- icon('info') %><%= hint %></p><% } %>
+<form class="form card admin-form" method="post" action="<%= action %>"<% if (typeof multipart !== 'undefined' && multipart) { %> enctype="multipart/form-data"<% } %>>
+  <input type="hidden" name="_csrf" value="<%= csrf %>">
+  <% fields.forEach(function (f) { %>
+    <% if (f.pair) { %>
+      <div class="form-row form-row--lang">
+        <% f.pair.forEach(function (pf) { %><%- include('_field', { f: pf, values: null }) %><% }) %>
+      </div>
+    <% } else { %><%- include('_field', { f, values: null }) %><% } %>
+  <% }) %>
+  <div class="admin-form__actions">
+    <button class="btn btn--primary" type="submit"><%- icon('check') %>Сохранить</button>
+    <a class="btn btn--ghost" href="<%= backUrl %>">Отмена</a>
+  </div>
+</form>
+<% if (deleteUrl) { %>
+<form method="post" action="<%= deleteUrl %>" class="delete-form" data-confirm="Удалить безвозвратно?">
+  <input type="hidden" name="_csrf" value="<%= csrf %>">
+  <button class="btn btn--danger btn--sm" type="submit">Удалить</button>
+</form>
+<% } %>
+<%- include('_foot') %>

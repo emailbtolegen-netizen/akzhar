@@ -1,0 +1,27 @@
+<%- include('_head', { title: 'История', active: '/admin/history' }) %>
+<div class="admin-head">
+  <h1>История поселка</h1>
+  <a class="btn btn--primary" href="/admin/history/new"><%- icon('plus') %>Добавить раздел</a>
+</div>
+<p class="notice"><%- icon('info') %>Публикуйте только проверенные сведения. Фотографии прошлого, документы, воспоминания старожилов и видео добавляются в разделе «Фото и видео» → «История поселка».</p>
+<div class="table-wrap card">
+  <table class="table">
+    <thead><tr><th>№</th><th>Раздел</th><th>Текст</th></tr></thead>
+    <tbody>
+    <% sections.forEach(function (s) { %>
+      <tr>
+        <td><%= s.sort %></td>
+        <td><a href="/admin/history/<%= s.id %>"><strong><%= s.title_ru %></strong></a><br><span class="muted"><%= s.title_kk %></span></td>
+        <td><span class="lang-tag<%= s.body_kk ? ' is-on' : '' %>">ҚАЗ</span> <span class="lang-tag<%= s.body_ru ? ' is-on' : '' %>">РУС</span></td>
+      </tr>
+    <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<div class="admin-head admin-head--sub">
+  <h2>Материалы истории (<%= media.length %>)</h2>
+  <a class="btn btn--ghost btn--sm" href="/admin/media/new?section=history"><%- icon('plus') %>Добавить фото, документ или воспоминание</a>
+</div>
+<p><a href="/admin/media?section=history">Открыть все материалы истории →</a></p>
+<%- include('_foot') %>

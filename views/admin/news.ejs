@@ -1,0 +1,25 @@
+<%- include('_head', { title: 'Новости', active: '/admin/news' }) %>
+<div class="admin-head">
+  <h1>Новости</h1>
+  <a class="btn btn--primary" href="/admin/news/new"><%- icon('plus') %>Добавить новость</a>
+</div>
+<div class="table-wrap card">
+  <table class="table">
+    <thead><tr><th>Заголовок</th><th>Рубрика</th><th>Дата</th><th>Языки</th><th>Статус</th></tr></thead>
+    <tbody>
+    <% news.forEach(function (n) { %>
+      <tr>
+        <td><a href="/admin/news/<%= n.id %>"><strong><%= n.title_ru || n.title_kk %></strong></a>
+          <% if (n.is_example) { %> <span class="chip chip--example">Пример</span><% } %>
+          <% if (n.is_important) { %> <span class="chip chip--alert">Важно</span><% } %></td>
+        <td><%= kinds[n.kind] %></td>
+        <td><%= n.published_at.slice(0, 10) %></td>
+        <td><span class="lang-tag<%= n.body_kk ? ' is-on' : '' %>">ҚАЗ</span> <span class="lang-tag<%= n.body_ru ? ' is-on' : '' %>">РУС</span></td>
+        <td><%= n.published ? 'На сайте' : 'Черновик' %></td>
+      </tr>
+    <% }) %>
+    <% if (!news.length) { %><tr><td colspan="5" class="muted">Новостей пока нет</td></tr><% } %>
+    </tbody>
+  </table>
+</div>
+<%- include('_foot') %>

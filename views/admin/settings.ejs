@@ -1,0 +1,19 @@
+<%- include('_head', { title: 'Настройки', active: '/admin/settings' }) %>
+<div class="admin-head"><h1>Настройки сайта</h1></div>
+<form class="form admin-form" method="post" action="/admin/settings" enctype="multipart/form-data">
+  <input type="hidden" name="_csrf" value="<%= csrf %>">
+  <% groups.forEach(function (g) { %>
+  <fieldset class="card admin-fieldset">
+    <legend><%= g.group %></legend>
+    <% g.fields.forEach(function (f) { %>
+      <% if (f.pair) { %>
+        <div class="form-row form-row--lang"><% f.pair.forEach(function (pf) { %><%- include('_field', { f: Object.assign({}, pf, { value: values[pf.name] }), values }) %><% }) %></div>
+      <% } else { %><%- include('_field', { f: Object.assign({}, f, { value: values[f.name] }), values }) %><% } %>
+    <% }) %>
+  </fieldset>
+  <% }) %>
+  <div class="admin-form__actions admin-form__actions--sticky">
+    <button class="btn btn--primary btn--lg" type="submit"><%- icon('check') %>Сохранить настройки</button>
+  </div>
+</form>
+<%- include('_foot') %>

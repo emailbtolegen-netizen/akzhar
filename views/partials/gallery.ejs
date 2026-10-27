@@ -1,0 +1,14 @@
+<div class="gallery" data-gallery>
+  <% photos.forEach(function (ph, i) { const cap = p(ph, 'title'); %>
+  <a class="gallery__item<%= i === 0 && typeof wide !== 'undefined' && wide ? ' gallery__item--wide' : '' %>" href="<%= ph.file || ph.url %>" data-caption="<%= cap %><%= ph.year_label ? ' · ' + ph.year_label : '' %>">
+    <img src="<%= ph.file || ph.url %>" alt="<%= cap %>" loading="lazy" decoding="async">
+    <% if (ph.year_label) { %><span class="gallery__year"><%= ph.year_label %></span><% } %>
+  </a>
+  <% }) %>
+</div>
+<dialog class="lightbox" data-lightbox aria-label="<%= t('home_gallery') %>">
+  <button class="lightbox__close" type="button" data-close aria-label="<%= t('close') %>"><%- icon('close') %></button>
+  <button class="lightbox__nav lightbox__prev" type="button" data-prev aria-label="<%= t('gallery_prev') %>"><%- icon('arrowLeft') %></button>
+  <figure><img alt="" data-lightbox-img><figcaption data-lightbox-cap></figcaption></figure>
+  <button class="lightbox__nav lightbox__next" type="button" data-next aria-label="<%= t('gallery_next') %>"><%- icon('arrow') %></button>
+</dialog>

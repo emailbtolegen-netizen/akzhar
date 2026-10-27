@@ -1,0 +1,17 @@
+<article class="card ad-card">
+  <a class="ad-card__media" href="<%= url('/ads/' + ad.id) %>" tabindex="-1" aria-hidden="true">
+    <% if (ad.photo) { %><img src="<%= ad.photo %>" alt="" loading="lazy" decoding="async">
+    <% } else { %><span class="ad-card__placeholder"><%- icon(ad.cat_icon) %></span><% } %>
+  </a>
+  <div class="ad-card__body">
+    <span class="chip"><%- icon(ad.cat_icon) %><%= lang === 'kk' ? ad.cat_kk : ad.cat_ru %></span>
+    <h3 class="ad-card__title"><a href="<%= url('/ads/' + ad.id) %>"><%= ad.title %></a></h3>
+    <p class="ad-card__text"><%= excerpt(ad.description, 110) %></p>
+    <p class="ad-card__price"><%= ad.price != null ? formatPrice(ad.price) : t('ads_price_negotiable') %></p>
+    <p class="meta"><%- icon('calendar') %><%= date(ad.published_at) %></p>
+  </div>
+  <div class="ad-card__actions">
+    <a class="btn btn--primary btn--sm" href="<%= phoneHref(ad.phone) %>"><%- icon('phone') %><%= t('ads_call') %></a>
+    <a class="btn btn--ghost btn--sm" href="<%= url('/ads/' + ad.id) %>"><%= t('ads_details') %></a>
+  </div>
+</article>

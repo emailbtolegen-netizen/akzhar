@@ -1,0 +1,74 @@
+<% const catName = lang === 'kk' ? ad.cat_kk : ad.cat_ru; %>
+<%- include('partials/head', { title: ad.title, description: excerpt(ad.description, 170), image: photos[0] && photos[0].filename }) %>
+
+<div class="container article-wrap">
+  <a class="back-link" href="<%= url('/ads') %>"><%- icon('arrowLeft') %><%= t('ads_back') %></a>
+
+  <% if (ad.status !== 'approved') { %>
+    <p class="notice notice--warn"><%- icon('alert') %>Предпросмотр для модератора: статус «<%= ad.status %>». Объявление не видно посетителям.</p>
+  <% } %>
+  <% if (reported) { %><p class="notice notice--ok" role="status"><%- icon('check') %><%= t('ads_report_thanks') %></p><% } %>
+
+  <div class="ad-detail">
+    <div class="ad-detail__gallery">
+      <% if (photos.length) { %>
+        <%- include('partials/gallery', { photos: photos.map(f => ({ file: f.filename, title_kk: ad.title, title_ru: ad.title })), wide: true }) %>
+      <% } else { %>
+        <div class="ad-detail__nophoto"><%- icon(ad.cat_icon) %><span><%= t('ads_no_photo') %></span></div>
+      <% } %>
+    </div>
+
+    <div class="ad-detail__info card">
+      <span class="chip"><%- icon(ad.cat_icon) %><%= catName %></span>
+      <h1 class="ad-detail__title"><%= ad.title %></h1>
+      <p class="ad-detail__price"><%= ad.price != null ? formatPrice(ad.price) : t('ads_price_negotiable') %></p>
+      <dl class="facts">
+        <div><dt><%= t('ads_author') %></dt><dd><%= ad.author_name %></dd></div>
+        <div><dt><%= t('ads_published') %></dt><dd><%= date(ad.published_at || ad.created_at) %></dd></div>
+        <% if (ad.expires_at) { %><div><dt><%= t('ads_expires') %></dt><dd><%= expired ? t('ads_expired') : date(ad.expires_at) %></dd></div><% } %>
+      </dl>
+      <% if (!expired) { %>
+      <a class="btn btn--primary btn--lg btn--block" href="<%= phoneHref(ad.phone) %>"><%- icon('phone') %><%= t('ads_call') %>: <%= phoneDisplay(ad.phone) %></a>
+      <% if (whatsappHref(ad.phone)) { %><a class="btn btn--ghost btn--block" href="<%= whatsappHref(ad.phone) %>" target="_blank" rel="noopener"><%- icon('whatsapp') %>WhatsApp</a><% } %>
+      <% } else { %>
+      <p class="notice"><%- icon('clock') %><%= t('ads_expired') %></p>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="ad-detail__desc card">
+    <div class="prose"><%- paragraphs(ad.description) %></div>
+    <%- include('partials/share', { shareTitle: ad.title }) %>
+  </div>
+
+  <% if (ad.status === 'approved') { %>
+  <details class="report" <%= reported ? '' : '' %>>
+    <summary><%- icon('flag') %><%= t('ads_report') %></summary>
+    <form method="post" action="<%= url('/ads/' + ad.id + '/report') %>" class="form report__form">
+      <h2 class="form__title"><%= t('ads_report_title') %></h2>
+      <input type="hidden" name="ft" value="<%= formToken() %>">
+      <div class="hp" aria-hidden="true"><label>Website <input name="website" tabindex="-1" autocomplete="off"></label></div>
+      <fieldset class="field">
+        <legend><%= t('ads_report_reason') %></legend>
+        <% reasons.forEach(function (r, i) { %>
+        <label class="radio"><input type="radio" name="reason" value="<%= r %>"<%= i === 0 ? ' checked' : '' %>><span><%= t('ads_report_' + r) %></span></label>
+        <% }) %>
+      </fieldset>
+      <div class="field">
+        <label for="comment"><%= t('ads_report_comment') %></label>
+        <textarea id="comment" name="comment" rows="3" maxlength="500"></textarea>
+      </div>
+      <button class="btn btn--danger" type="submit"><%= t('ads_report_send') %></button>
+    </form>
+  </details>
+  <% } %>
+
+  <% if (similar.length) { %>
+  <section class="section section--flush">
+    <h2 class="section-title section-title--sm"><%= catName %></h2>
+    <div class="card-grid card-grid--3"><% similar.forEach(function (s) { %><%- include('partials/ad-card', { ad: s }) %><% }) %></div>
+  </section>
+  <% } %>
+</div>
+
+<%- include('partials/foot') %>

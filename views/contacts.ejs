@@ -1,0 +1,55 @@
+<%
+  const v = (k) => values[k] == null ? '' : values[k];
+  const err = (k) => errors[k] ? `<p class="field__error" id="e-${k}">${escapeHtml(errors[k])}</p>` : '';
+  const hours = p(settings, 'contact_hours');
+%>
+<%- include('partials/head', { title: t('contacts_title'), description: t('contacts_lead') }) %>
+
+<section class="page-hero">
+  <div class="container">
+    <h1 class="page-title"><%= t('contacts_title') %></h1>
+    <p class="lead"><%= t('contacts_lead') %></p>
+  </div>
+</section>
+
+<div class="container contacts-grid">
+  <div class="card contact-info">
+    <dl class="facts facts--stack">
+      <div><dt><%- icon('pin') %><%= t('contacts_address') %></dt><dd><%= p(settings, 'address') || (p(settings, 'site_name') + ', ' + p(settings, 'region')) %></dd></div>
+      <div><dt><%- icon('phone') %><%= t('contacts_phone') %></dt><dd><% if (settings.contact_phone) { %><a href="<%= phoneHref(settings.contact_phone) %>"><%= phoneDisplay(settings.contact_phone) %></a><% } else { %><span class="muted"><%= t('data_pending') %></span><% } %></dd></div>
+      <div><dt><%- icon('mail') %><%= t('contacts_email') %></dt><dd><% if (settings.contact_email) { %><a href="mailto:<%= settings.contact_email %>"><%= settings.contact_email %></a><% } else { %><span class="muted"><%= t('data_pending') %></span><% } %></dd></div>
+      <% if (hours) { %><div><dt><%- icon('clock') %><%= t('contacts_hours') %></dt><dd><%= hours %></dd></div><% } %>
+    </dl>
+    <div class="btn-row">
+      <% if (settings.whatsapp) { %><a class="btn btn--ghost" href="<%= whatsappHref(settings.whatsapp) %>" target="_blank" rel="noopener"><%- icon('whatsapp') %>WhatsApp</a><% } %>
+      <a class="btn btn--ghost" href="<%= url('/phones') %>"><%- icon('phone') %><%= t('nav_phones') %></a>
+    </div>
+  </div>
+
+  <div class="card" id="form">
+    <h2 class="form__title"><%= t('contacts_form') %></h2>
+    <% if (sent) { %><p class="notice notice--ok" role="status"><%- icon('check') %><%= t('contacts_sent') %></p><% } %>
+    <% if (errors._form) { %><p class="notice notice--error" role="alert"><%- icon('alert') %><%= errors._form %></p><% } %>
+    <form class="form" method="post" action="<%= url('/contacts') %>" novalidate>
+      <input type="hidden" name="ft" value="<%= formToken() %>">
+      <div class="hp" aria-hidden="true"><label>Website <input name="website" tabindex="-1" autocomplete="off"></label></div>
+      <div class="field">
+        <label for="c-name"><%= t('contacts_your_name') %> <span class="req">*</span></label>
+        <input id="c-name" name="name" maxlength="80" required autocomplete="name" value="<%= v('name') %>">
+        <%- err('name') %>
+      </div>
+      <div class="field">
+        <label for="c-contact"><%= t('contacts_your_contact') %></label>
+        <input id="c-contact" name="contact" maxlength="120" value="<%= v('contact') %>">
+      </div>
+      <div class="field">
+        <label for="c-text"><%= t('contacts_message') %> <span class="req">*</span></label>
+        <textarea id="c-text" name="text" rows="5" maxlength="3000" required><%= v('text') %></textarea>
+        <%- err('text') %>
+      </div>
+      <button class="btn btn--primary btn--lg" type="submit"><%- icon('mail') %><%= t('contacts_send') %></button>
+    </form>
+  </div>
+</div>
+
+<%- include('partials/foot') %>

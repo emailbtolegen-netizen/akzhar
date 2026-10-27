@@ -1,0 +1,48 @@
+<%- include('_head', { title: 'Телефоны', active: '/admin/phones' }) %>
+<div class="admin-head">
+  <h1>Полезные телефоны</h1>
+  <a class="btn btn--primary" href="/admin/phones/new"><%- icon('plus') %>Добавить номер</a>
+</div>
+<p class="notice notice--warn"><%- icon('alert') %>Перед публикацией дозвонитесь по каждому номеру и отметьте «Номер проверен». Номера частных мастеров размещайте только с их согласия.</p>
+
+<% groups.forEach(function (g) { %>
+<section class="admin-group">
+  <form class="group-edit" method="post" action="/admin/phone-groups">
+    <input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="id" value="<%= g.id %>">
+    <input name="name_ru" value="<%= g.name_ru %>" aria-label="Название группы (РУС)">
+    <input name="name_kk" value="<%= g.name_kk %>" aria-label="Название группы (ҚАЗ)">
+    <input name="sort" type="number" value="<%= g.sort %>" aria-label="Порядок" class="input-sort">
+    <button class="btn btn--ghost btn--sm" type="submit">Сохранить группу</button>
+  </form>
+  <div class="table-wrap card">
+    <table class="table">
+      <thead><tr><th>Название</th><th>Телефон</th><th>На главной</th><th>Проверен</th></tr></thead>
+      <tbody>
+      <% g.phones.forEach(function (p) { %>
+        <tr<%= p.phone ? '' : ' class="row-warn"' %>>
+          <td><a href="/admin/phones/<%= p.id %>"><strong><%= p.name_ru %></strong></a><br><span class="muted"><%= p.name_kk %></span></td>
+          <td><%= p.phone ? phoneDisplay(p.phone) : '— не указан —' %><% if (p.phone2) { %><br><%= phoneDisplay(p.phone2) %><% } %></td>
+          <td><%= p.featured ? '✓' : '' %></td>
+          <td><%= p.verified ? '✓' : '' %></td>
+        </tr>
+      <% }) %>
+      </tbody>
+    </table>
+  </div>
+  <% if (!g.phones.length) { %>
+  <form method="post" action="/admin/phone-groups/<%= g.id %>/delete"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="linklike" type="submit">Удалить пустую группу</button></form>
+  <% } %>
+</section>
+<% }) %>
+
+<section class="card admin-card">
+  <h2>Новая группа</h2>
+  <form class="group-edit" method="post" action="/admin/phone-groups">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <input name="name_ru" placeholder="Название (РУС)" required>
+    <input name="name_kk" placeholder="Название (ҚАЗ)">
+    <input name="sort" type="number" value="99" class="input-sort" aria-label="Порядок">
+    <button class="btn btn--primary btn--sm" type="submit">Добавить группу</button>
+  </form>
+</section>
+<%- include('_foot') %>

@@ -1,0 +1,38 @@
+<%
+  const title = p(item, 'title');
+  const body = p(item, 'body');
+  const jsonLd = {
+    '@context': 'https://schema.org', '@type': 'NewsArticle', headline: title,
+    datePublished: item.published_at.replace(' ', 'T') + 'Z', inLanguage: lang,
+    image: item.image ? [baseUrl + item.image] : undefined,
+    publisher: { '@type': 'Organization', name: t('site_title') },
+  };
+%>
+<%- include('partials/head', { title, description: excerpt(body, 170), image: item.image, jsonLd: item.is_example ? null : jsonLd }) %>
+
+<article class="container article-wrap article">
+  <a class="back-link" href="<%= url('/news') %>"><%- icon('arrowLeft') %><%= t('news_back') %></a>
+  <div class="news-card__tags">
+    <span class="chip chip--soft"><%= t('news_kind_' + item.kind) %></span>
+    <% if (item.is_important) { %><span class="chip chip--alert"><%= t('news_important') %></span><% } %>
+    <% if (item.is_example) { %><span class="chip chip--example"><%= t('example_badge') %></span><% } %>
+  </div>
+  <h1 class="article__title"><%= title %></h1>
+  <p class="meta"><%- icon('calendar') %><time datetime="<%= item.published_at.slice(0, 10) %>"><%= date(item.published_at) %></time></p>
+  <% if (item.is_example) { %><p class="notice notice--example"><%- icon('info') %><%= t('example_note') %></p><% } %>
+  <% if (!item['body_' + lang]) { %><p class="notice"><%- icon('info') %><%= t('no_translation') %></p><% } %>
+  <% if (item.image) { %><img class="article__image" src="<%= item.image %>" alt="" decoding="async"><% } %>
+  <div class="prose"><%- paragraphs(body) %></div>
+  <%- include('partials/share', { shareTitle: title }) %>
+</article>
+
+<% if (more.length) { %>
+<section class="section section--tinted">
+  <div class="container">
+    <div class="section-head"><h2 class="section-title section-title--sm"><%= t('home_latest_news') %></h2></div>
+    <div class="card-grid card-grid--3"><% more.forEach(function (n) { %><%- include('partials/news-card', { item: n }) %><% }) %></div>
+  </div>
+</section>
+<% } %>
+
+<%- include('partials/foot') %>

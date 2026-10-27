@@ -1,0 +1,37 @@
+<%- include('_head', { title: 'Пользователи', active: '/admin/users' }) %>
+<div class="admin-head"><h1>Пользователи панели</h1></div>
+<% if (error) { %><p class="notice notice--error"><%- icon('alert') %><%= error %></p><% } %>
+<div class="table-wrap card">
+  <table class="table">
+    <thead><tr><th>Логин</th><th>Роль</th><th>Создан</th><th></th></tr></thead>
+    <tbody>
+    <% users.forEach(function (u) { %>
+      <tr>
+        <td><strong><%= u.username %></strong></td>
+        <td><%= ({ admin: 'Администратор', editor: 'Редактор', moderator: 'Модератор' })[u.role] %></td>
+        <td><%= u.created_at.slice(0, 10) %></td>
+        <td><% if (u.id !== user.id) { %><form method="post" action="/admin/users/<%= u.id %>/delete" data-confirm="Удалить пользователя <%= u.username %>?"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="linklike" type="submit">Удалить</button></form><% } else { %><span class="muted">это вы</span><% } %></td>
+      </tr>
+    <% }) %>
+    </tbody>
+  </table>
+</div>
+
+<section class="card admin-card">
+  <h2>Добавить пользователя</h2>
+  <ul class="role-help">
+    <li><strong>Администратор</strong> — все разделы, настройки, пользователи.</li>
+    <li><strong>Редактор</strong> — новости, история, телефоны, фото/видео, объявления, сообщения.</li>
+    <li><strong>Модератор</strong> — только проверка объявлений и сообщения.</li>
+  </ul>
+  <form class="form" method="post" action="/admin/users" autocomplete="off">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <div class="form-row">
+      <div class="field"><label for="nu">Логин</label><input id="nu" name="username" required pattern="[A-Za-z0-9_.\-]{3,60}"></div>
+      <div class="field"><label for="np">Пароль (не короче 10 символов)</label><input id="np" name="password" type="password" minlength="10" autocomplete="new-password" required></div>
+    </div>
+    <div class="field"><label for="nr">Роль</label><select id="nr" name="role"><option value="moderator">Модератор</option><option value="editor">Редактор</option><option value="admin">Администратор</option></select></div>
+    <button class="btn btn--primary" type="submit">Создать</button>
+  </form>
+</section>
+<%- include('_foot') %>

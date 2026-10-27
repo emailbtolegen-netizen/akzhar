@@ -1,0 +1,65 @@
+<%
+  const siteName = p(settings, 'site_name');
+  const fullTitle = (typeof title !== 'undefined' && title) ? `${title} — ${t('site_title')}` : `${t('site_title')} — ${t('site_tagline')}`;
+  const desc = (typeof description !== 'undefined' && description) ? description : p(settings, 'welcome');
+  const ogImage = (typeof image !== 'undefined' && image) ? image : settings.hero_poster;
+  const transparent = typeof heroHeader !== 'undefined' && heroHeader;
+  const nav = [
+    ['home', '', 'nav_home'], ['history', '/history', 'nav_history'], ['phones', '/phones', 'nav_phones'],
+    ['ads', '/ads', 'nav_ads'], ['news', '/news', 'nav_news'], ['about', '/about', 'nav_about'], ['contacts', '/contacts', 'nav_contacts'],
+  ];
+%><!doctype html>
+<html lang="<%= lang %>">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title><%= fullTitle %></title>
+<meta name="description" content="<%= excerpt(desc, 180) %>">
+<link rel="canonical" href="<%= baseUrl %>/<%= lang %><%= pathNoLang === '/' ? '' : pathNoLang %>">
+<% altLangs.forEach(function (l) { %><link rel="alternate" hreflang="<%= l.code %>" href="<%= baseUrl %><%= l.href.split('?')[0].replace(/\/$/, '') %>">
+<% }) %><link rel="alternate" hreflang="x-default" href="<%= baseUrl %>/kk<%= pathNoLang === '/' ? '' : pathNoLang %>">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="<%= t('site_title') %>">
+<meta property="og:title" content="<%= fullTitle %>">
+<meta property="og:description" content="<%= excerpt(desc, 180) %>">
+<meta property="og:image" content="<%= ogImage && ogImage.startsWith('http') ? ogImage : baseUrl + ogImage %>">
+<meta property="og:locale" content="<%= lang === 'kk' ? 'kk_KZ' : 'ru_RU' %>">
+<meta name="theme-color" content="#1f5f6e">
+<link rel="icon" href="/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@500;600;700&display=swap&subset=cyrillic-ext">
+<link rel="stylesheet" href="/css/style.css?v=1">
+<script src="/js/main.js?v=1" defer></script>
+<% if (typeof jsonLd !== 'undefined' && jsonLd) { %><script type="application/ld+json"><%- JSON.stringify(jsonLd).replace(/</g, '\\u003c') %></script><% } %>
+</head>
+<body class="page-<%= page %>">
+<a class="skip-link" href="#main"><%= t('skip_to_content') %></a>
+<header class="site-header<%= transparent ? ' is-transparent' : '' %>" data-header>
+  <div class="container header-inner">
+    <a class="brand" href="<%= url() %>" aria-label="<%= t('site_title') %>">
+      <img src="/img/logo.svg" alt="" width="40" height="40">
+      <span class="brand-text"><strong><%= siteName %></strong><small><%= p(settings, 'region') %></small></span>
+    </a>
+    <nav class="main-nav" id="main-nav" aria-label="<%= t('menu') %>" data-nav>
+      <ul>
+        <% nav.forEach(function (n) { %>
+        <li><a href="<%= url(n[1]) %>"<% if (page === n[0]) { %> aria-current="page"<% } %>><%= t(n[2]) %></a></li>
+        <% }) %>
+      </ul>
+      <div class="lang-switch lang-switch--menu" role="group" aria-label="Тіл / Язык">
+        <% altLangs.forEach(function (l) { %><a href="<%= l.href %>" hreflang="<%= l.code %>" lang="<%= l.code %>"<% if (l.active) { %> aria-current="true"<% } %>><%= l.code === 'kk' ? 'ҚАЗ' : 'РУС' %></a><% }) %>
+      </div>
+    </nav>
+    <div class="header-actions">
+      <div class="lang-switch" role="group" aria-label="Тіл / Язык">
+        <% altLangs.forEach(function (l) { %><a href="<%= l.href %>" hreflang="<%= l.code %>" lang="<%= l.code %>"<% if (l.active) { %> aria-current="true"<% } %>><%= l.code === 'kk' ? 'ҚАЗ' : 'РУС' %></a><% }) %>
+      </div>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav" data-menu-toggle>
+        <%- icon('menu', 'icon-open') %><%- icon('close', 'icon-close') %>
+        <span class="visually-hidden"><%= t('menu') %></span>
+      </button>
+    </div>
+  </div>
+</header>
+<main id="main">

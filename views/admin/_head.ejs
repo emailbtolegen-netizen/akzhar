@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title><%= typeof title !== 'undefined' ? title + ' — ' : '' %>Панель управления · Акжар</title>
+<link rel="icon" href="/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/css/style.css?v=1">
+<link rel="stylesheet" href="/css/admin.css?v=1">
+<script src="/js/admin.js?v=1" defer></script>
+</head>
+<body class="admin">
+<% if (user) {
+  const items = [
+    ['/admin', 'Обзор', 'home', true], ['/admin/ads', 'Объявления', 'megaphone', can('ads')], ['/admin/news', 'Новости', 'calendar', can('news')],
+    ['/admin/history', 'История', 'book', can('history')], ['/admin/phones', 'Телефоны', 'phone', can('phones')],
+    ['/admin/media', 'Фото и видео', 'image', can('media')], ['/admin/places', 'Интересные места', 'pin', can('places')],
+    ['/admin/categories', 'Категории', 'tag', can('categories')], ['/admin/messages', 'Сообщения', 'mail', can('messages')],
+    ['/admin/settings', 'Настройки', 'tool', can('settings')], ['/admin/users', 'Пользователи', 'user', can('users')],
+  ];
+  const here = typeof active !== 'undefined' ? active : '';
+%>
+<header class="admin-top">
+  <a class="admin-brand" href="/admin"><img src="/img/logo.svg" alt="" width="32" height="32"><span>Акжар · управление</span></a>
+  <button class="admin-menu-btn" type="button" data-admin-menu aria-expanded="false"><%- icon('menu') %><span class="visually-hidden">Меню</span></button>
+  <div class="admin-top__right">
+    <a href="/ru" target="_blank"><%- icon('external') %>Открыть сайт</a>
+    <a href="/admin/password"><%- icon('user') %><%= user.username %> (<%= ({ admin: 'администратор', editor: 'редактор', moderator: 'модератор' })[user.role] %>)</a>
+    <form method="post" action="/admin/logout"><input type="hidden" name="_csrf" value="<%= csrf %>"><button type="submit" class="linklike">Выйти</button></form>
+  </div>
+</header>
+<div class="admin-shell">
+  <nav class="admin-nav" data-admin-nav>
+    <% items.filter(i => i[3]).forEach(function (i) { %>
+      <a href="<%= i[0] %>"<%= here === i[0] ? ' aria-current="page"' : '' %>><%- icon(i[2]) %><%= i[1] %></a>
+    <% }) %>
+  </nav>
+  <main class="admin-main">
+    <% if (flash) { %><p class="notice notice--ok" role="status"><%- icon('check') %><%= flash %></p><% } %>
+<% } else { %>
+<main class="admin-main admin-main--center">
+<% } %>

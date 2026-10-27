@@ -1,0 +1,46 @@
+</main>
+<footer class="site-footer">
+  <div class="ornament-band" aria-hidden="true"></div>
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <a class="brand brand--light" href="<%= url() %>">
+        <img src="/img/logo.svg" alt="" width="44" height="44">
+        <span class="brand-text"><strong><%= p(settings, 'site_name') %></strong><small><%= p(settings, 'region') %></small></span>
+      </a>
+      <p><%= t('footer_about') %></p>
+    </div>
+    <div>
+      <h2 class="footer-title"><%= t('footer_sections') %></h2>
+      <ul class="footer-links">
+        <li><a href="<%= url('/history') %>"><%= t('nav_history') %></a></li>
+        <li><a href="<%= url('/phones') %>"><%= t('nav_phones') %></a></li>
+        <li><a href="<%= url('/ads') %>"><%= t('nav_ads') %></a></li>
+        <li><a href="<%= url('/news') %>"><%= t('nav_news') %></a></li>
+        <li><a href="<%= url('/about') %>"><%= t('nav_about') %></a></li>
+      </ul>
+    </div>
+    <div>
+      <h2 class="footer-title"><%= t('footer_contacts') %></h2>
+      <ul class="footer-contacts">
+        <% if (p(settings, 'address')) { %><li><%- icon('pin') %><span><%= p(settings, 'address') %></span></li><% } %>
+        <% if (settings.contact_phone) { %><li><%- icon('phone') %><a href="<%= phoneHref(settings.contact_phone) %>"><%= phoneDisplay(settings.contact_phone) %></a></li><% } %>
+        <% if (settings.contact_email) { %><li><%- icon('mail') %><a href="mailto:<%= settings.contact_email %>"><%= settings.contact_email %></a></li><% } %>
+        <li><%- icon('alert') %><span><%= t('phones_emergency') %>: <a href="tel:112"><strong>112</strong></a></span></li>
+        <li><%- icon('arrow') %><a href="<%= url('/contacts') %>"><%= t('contacts_form') %></a></li>
+      </ul>
+      <% if (settings.whatsapp || settings.instagram) { %>
+      <div class="footer-social">
+        <% if (settings.whatsapp) { %><a href="<%= whatsappHref(settings.whatsapp) %>" rel="noopener" target="_blank" aria-label="WhatsApp"><%- icon('whatsapp') %></a><% } %>
+        <% if (settings.instagram) { %><a href="<%= settings.instagram %>" rel="noopener" target="_blank" aria-label="Instagram"><%- icon('instagram') %></a><% } %>
+      </div>
+      <% } %>
+    </div>
+  </div>
+  <div class="container footer-bottom">
+    <span>© <%= new Date().getFullYear() %> <%= t('site_title') %>. <%= t('footer_rights') %>.</span>
+    <span><%= t('footer_disclaimer') %></span>
+    <a href="/admin"><%= t('footer_admin') %></a>
+  </div>
+</footer>
+</body>
+</html>

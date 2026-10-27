@@ -1,0 +1,177 @@
+<%
+  const embed = embedUrl(settings.video_url);
+  const jsonLd = {
+    '@context': 'https://schema.org', '@type': 'Place',
+    name: p(settings, 'site_name'), description: p(settings, 'welcome'),
+    address: { '@type': 'PostalAddress', addressRegion: lang === 'kk' ? 'Атырау облысы' : 'Атырауская область', addressCountry: 'KZ' },
+    url: baseUrl + '/' + lang,
+  };
+%>
+<%- include('partials/head', { title: '', heroHeader: true, jsonLd }) %>
+
+<section class="hero" data-hero>
+  <div class="hero__media">
+    <img class="hero__poster" src="<%= settings.hero_poster %>" alt="" fetchpriority="high" decoding="async">
+    <% if (settings.hero_video) { %>
+    <video class="hero__video" data-hero-video muted loop playsinline preload="none" aria-hidden="true"
+           data-src="<%= settings.hero_video %>" data-src-mobile="<%= settings.hero_video_mobile || settings.hero_video %>"></video>
+    <% } %>
+  </div>
+  <div class="hero__shade" aria-hidden="true"></div>
+  <div class="container hero__content">
+    <p class="hero__region"><%- icon('pin') %><%= p(settings, 'region') %></p>
+    <h1 class="hero__title"><%= p(settings, 'site_name') %></h1>
+    <p class="hero__slogan"><%= p(settings, 'slogan') %></p>
+    <div class="hero__actions">
+      <a class="btn btn--gold btn--lg" href="<%= url('/history') %>"><%= t('hero_about_btn') %><%- icon('arrow') %></a>
+      <% if (settings.full_video || embed) { %>
+      <button class="btn btn--glass btn--lg" type="button" data-open-video><%- icon('play') %><%= t('hero_watch') %></button>
+      <% } else if (settings.video_url) { %>
+      <a class="btn btn--glass btn--lg" href="<%= settings.video_url %>" target="_blank" rel="noopener"><%- icon('external') %><%= t('hero_open_original') %></a>
+      <% } %>
+    </div>
+  </div>
+  <div class="hero__controls">
+    <% if (settings.hero_video) { %>
+    <button class="hero__ctrl" type="button" data-hero-toggle hidden
+            data-label-pause="<%= t('hero_pause') %>" data-label-play="<%= t('hero_play') %>" aria-label="<%= t('hero_pause') %>">
+      <%- icon('pause', 'icon-pause') %><%- icon('play', 'icon-play') %>
+    </button>
+    <% } %>
+    <% if (settings.full_video || embed) { %>
+    <button class="hero__ctrl" type="button" data-open-video aria-label="<%= t('hero_sound_on') %>" title="<%= t('hero_sound_on') %>"><%- icon('volume') %></button>
+    <% } %>
+  </div>
+  <a class="hero__scroll" href="#welcome" aria-label="<%= t('hero_scroll') %>"><%- icon('down') %></a>
+</section>
+
+<dialog class="video-modal" data-video-modal aria-label="<%= t('hero_watch') %>">
+  <button class="video-modal__close" type="button" data-close aria-label="<%= t('close') %>"><%- icon('close') %></button>
+  <div class="video-modal__frame">
+    <% if (embed) { %>
+      <iframe data-embed-src="<%= embed %>" title="<%= p(settings, 'site_name') %>" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+    <% } else if (settings.full_video) { %>
+      <video controls playsinline preload="none" poster="<%= settings.hero_poster %>" data-full-video>
+        <source src="<%= settings.full_video %>" type="video/mp4">
+      </video>
+    <% } %>
+  </div>
+  <div class="video-modal__bar">
+    <% if (!embed) { %><span><%- icon('info') %><%= t('video_no_sound') %></span><% } %>
+    <% if (settings.video_url) { %><a href="<%= settings.video_url %>" target="_blank" rel="noopener"><%- icon('external') %><%= t('hero_open_original') %></a><% } %>
+  </div>
+</dialog>
+
+<section class="section welcome" id="welcome">
+  <div class="container welcome__grid">
+    <div class="welcome__text">
+      <p class="eyebrow"><%= t('home_welcome_title') %></p>
+      <h2 class="section-title"><%= t('site_title') %></h2>
+      <p class="lead"><%= p(settings, 'welcome') %></p>
+    </div>
+    <nav class="quick-links" aria-label="<%= t('footer_sections') %>">
+      <a class="quick-link" href="<%= url('/phones') %>"><%- icon('phone') %><span><%= t('nav_phones') %></span></a>
+      <a class="quick-link" href="<%= url('/ads') %>"><%- icon('megaphone') %><span><%= t('nav_ads') %></span></a>
+      <a class="quick-link" href="<%= url('/news') %>"><%- icon('calendar') %><span><%= t('nav_news') %></span></a>
+      <a class="quick-link" href="<%= url('/history') %>"><%- icon('book') %><span><%= t('nav_history') %></span></a>
+    </nav>
+  </div>
+</section>
+
+<section class="section section--tinted" aria-labelledby="quick-phones">
+  <div class="container">
+    <div class="section-head">
+      <h2 class="section-title" id="quick-phones"><%= t('home_quick_phones') %></h2>
+      <a class="link-arrow" href="<%= url('/phones') %>"><%= t('home_all_phones') %><%- icon('arrow') %></a>
+    </div>
+    <div class="phone-grid">
+      <% phones.forEach(function (ph) { %><%- include('partials/phone-card', { ph }) %><% }) %>
+      <div class="phone-card phone-card--emergency">
+        <span class="phone-card__icon"><%- icon('alert') %></span>
+        <div class="phone-card__info">
+          <h3 class="phone-card__name"><%= t('em_112') %></h3>
+          <a class="phone-card__number" href="tel:112">112</a>
+        </div>
+        <a class="phone-card__call" href="tel:112" aria-label="<%= t('phones_call') %>: 112"><%- icon('phone') %><span><%= t('phones_call') %></span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="latest-ads">
+  <div class="container">
+    <div class="section-head">
+      <h2 class="section-title" id="latest-ads"><%= t('home_latest_ads') %></h2>
+      <div class="section-head__actions">
+        <a class="btn btn--primary btn--sm" href="<%= url('/ads/new') %>"><%- icon('plus') %><%= t('ads_new') %></a>
+        <a class="link-arrow" href="<%= url('/ads') %>"><%= t('home_all_ads') %><%- icon('arrow') %></a>
+      </div>
+    </div>
+    <% if (ads.length) { %>
+      <div class="card-grid card-grid--4"><% ads.forEach(function (ad) { %><%- include('partials/ad-card', { ad }) %><% }) %></div>
+    <% } else { %>
+      <div class="empty-state">
+        <%- icon('megaphone') %>
+        <h3><%= t('ads_empty') %></h3>
+        <p><%= t('ads_empty_text') %></p>
+        <a class="btn btn--primary" href="<%= url('/ads/new') %>"><%- icon('plus') %><%= t('ads_new') %></a>
+      </div>
+    <% } %>
+  </div>
+</section>
+
+<section class="section section--tinted" aria-labelledby="latest-news">
+  <div class="container">
+    <div class="section-head">
+      <h2 class="section-title" id="latest-news"><%= t('home_latest_news') %></h2>
+      <a class="link-arrow" href="<%= url('/news') %>"><%= t('home_all_news') %><%- icon('arrow') %></a>
+    </div>
+    <% if (news.length) { %>
+      <div class="card-grid card-grid--3"><% news.forEach(function (item) { %><%- include('partials/news-card', { item }) %><% }) %></div>
+    <% } else { %>
+      <div class="empty-state"><%- icon('calendar') %><h3><%= t('news_empty') %></h3></div>
+    <% } %>
+  </div>
+</section>
+
+<section class="section" aria-labelledby="history-teaser">
+  <div class="container history-teaser">
+    <div class="history-teaser__media">
+      <img src="<%= photos[0] ? (photos[0].file || photos[0].url) : settings.hero_poster %>" alt="" loading="lazy">
+      <span class="history-teaser__ornament" aria-hidden="true"></span>
+    </div>
+    <div class="history-teaser__text">
+      <p class="eyebrow"><%= t('nav_history') %></p>
+      <h2 class="section-title" id="history-teaser"><%= t('home_history_title') %></h2>
+      <p class="lead"><%= t('home_history_text') %></p>
+      <a class="btn btn--primary" href="<%= url('/history') %>"><%= t('home_history_btn') %><%- icon('arrow') %></a>
+    </div>
+  </div>
+</section>
+
+<% if (photos.length) { %>
+<section class="section section--tinted" aria-labelledby="home-gallery">
+  <div class="container">
+    <div class="section-head">
+      <h2 class="section-title" id="home-gallery"><%= t('home_gallery') %></h2>
+      <a class="link-arrow" href="<%= url('/about#gallery') %>"><%= t('home_gallery_more') %><%- icon('arrow') %></a>
+    </div>
+    <%- include('partials/gallery', { photos, wide: true }) %>
+  </div>
+</section>
+<% } %>
+
+<section class="section" aria-labelledby="home-contacts">
+  <div class="container contact-strip">
+    <div>
+      <h2 class="section-title" id="home-contacts"><%= t('nav_contacts') %></h2>
+      <p class="lead"><%= t('contacts_lead') %></p>
+    </div>
+    <div class="contact-strip__actions">
+      <% if (settings.contact_phone) { %><a class="btn btn--ghost" href="<%= phoneHref(settings.contact_phone) %>"><%- icon('phone') %><%= phoneDisplay(settings.contact_phone) %></a><% } %>
+      <a class="btn btn--primary" href="<%= url('/contacts') %>"><%- icon('mail') %><%= t('contacts_form') %></a>
+    </div>
+  </div>
+</section>
+
+<%- include('partials/foot') %>

@@ -1,0 +1,17 @@
+<%- include('_head', { title: 'Сообщения', active: '/admin/messages' }) %>
+<div class="admin-head"><h1>Сообщения с сайта</h1></div>
+<div class="mod-list">
+  <% messages.forEach(function (m) { %>
+  <article class="card msg<%= m.is_read ? '' : ' msg--new' %>">
+    <p class="meta"><%= m.created_at %> UTC<%= m.is_read ? '' : ' · новое' %></p>
+    <h2><%= m.name %><% if (m.contact) { %> · <span class="muted"><%= m.contact %></span><% } %></h2>
+    <div class="prose"><%- paragraphs(m.text) %></div>
+    <div class="btn-row btn-row--left">
+      <% if (!m.is_read) { %><form method="post" action="/admin/messages/<%= m.id %>/read"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="btn btn--ghost btn--sm" type="submit">Прочитано</button></form><% } %>
+      <form method="post" action="/admin/messages/<%= m.id %>/delete" data-confirm="Удалить сообщение?"><input type="hidden" name="_csrf" value="<%= csrf %>"><button class="btn btn--danger btn--sm" type="submit">Удалить</button></form>
+    </div>
+  </article>
+  <% }) %>
+  <% if (!messages.length) { %><div class="empty-state"><%- icon('mail') %><h3>Сообщений нет</h3></div><% } %>
+</div>
+<%- include('_foot') %>

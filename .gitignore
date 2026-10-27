@@ -1,0 +1,12 @@
+node_modules/
+data/
+uploads/
+backups/
+.env
+# Raw drone footage (gigabytes) stays out of the repository and off the server
+*.MP4
+!public/media/*.mp4
+
+# Source materials provided by the owner (not part of the site)
+/WhatsApp Image*.jpeg
+/*.docx

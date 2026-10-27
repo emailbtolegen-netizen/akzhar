@@ -1,0 +1,59 @@
+<%- include('_head', { title: 'Объявления', active: '/admin/ads' }) %>
+<%
+  const tabs = [['pending', 'На проверке'], ['reported', 'С жалобами'], ['approved', 'Опубликованы'], ['expired', 'Истек срок'], ['rejected', 'Отклонены']];
+  const reasons = { spam: 'Спам', fraud: 'Мошенничество', false: 'Недостоверно', offensive: 'Оскорбления/незаконно', outdated: 'Неактуально', other: 'Другое' };
+  const fmt = (d) => d ? d.slice(0, 16).replace('T', ' ') : '—';
+%>
+<div class="admin-head"><h1>Объявления</h1></div>
+<nav class="tabs">
+  <% tabs.forEach(function (t) { %>
+  <a href="?status=<%= t[0] %>"<%= status === t[0] ? ' aria-current="page"' : '' %>><%= t[1] %><% if (counts[t[0]]) { %> <span class="badge"><%= counts[t[0]] %></span><% } %></a>
+  <% }) %>
+</nav>
+
+<% if (!ads.length) { %>
+  <div class="empty-state"><%- icon('check') %><h3>Здесь пусто</h3></div>
+<% } %>
+
+<div class="mod-list">
+<% ads.forEach(function (ad) { %>
+  <article class="card mod-item">
+    <div class="mod-item__photos">
+      <% if (ad.photos.length) { ad.photos.forEach(function (ph) { %><a href="<%= ph %>" target="_blank"><img src="<%= ph %>" alt="" loading="lazy"></a><% }) } else { %><span class="muted">Без фото</span><% } %>
+    </div>
+    <div class="mod-item__body">
+      <p class="meta">#<%= ad.id %> · <%= ad.cat %> · подано <%= fmt(ad.created_at) %> UTC<% if (ad.expires_at) { %> · до <%= fmt(ad.expires_at) %><% } %></p>
+      <h2><%= ad.title %></h2>
+      <p class="mod-item__price"><%= ad.price != null ? formatPrice(ad.price) : 'Цена не указана' %></p>
+      <div class="mod-item__desc"><%- paragraphs(ad.description) %></div>
+      <p><strong><%= ad.author_name %></strong> · <a href="<%= phoneHref(ad.phone) %>"><%= phoneDisplay(ad.phone) %></a> · срок <%= ad.duration_days %> дн.</p>
+      <% if (ad.reject_reason) { %><p class="notice notice--warn">Причина отклонения: <%= ad.reject_reason %></p><% } %>
+      <% if (ad.reportList.length) { %>
+        <div class="reports">
+          <strong>Жалобы (<%= ad.reportList.length %>):</strong>
+          <ul><% ad.reportList.forEach(function (r) { %><li><%= reasons[r.reason] || r.reason %><% if (r.comment) { %> — «<%= r.comment %>»<% } %> <span class="muted">(<%= fmt(r.created_at) %>)</span></li><% }) %></ul>
+        </div>
+      <% } %>
+    </div>
+    <div class="mod-item__actions">
+      <% if (ad.status !== 'approved' || status === 'expired' || status === 'reported') { %>
+      <form method="post" action="/admin/ads/<%= ad.id %>/approve"><input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="from" value="<%= status %>">
+        <button class="btn btn--primary btn--sm btn--block" type="submit"><%- icon('check') %><%= status === 'expired' ? 'Продлить' : 'Опубликовать' %></button></form>
+      <% } %>
+      <% if (ad.reportList.length && ad.status === 'approved') { %>
+      <form method="post" action="/admin/ads/<%= ad.id %>/dismiss-reports"><input type="hidden" name="_csrf" value="<%= csrf %>">
+        <button class="btn btn--ghost btn--sm btn--block" type="submit">Жалобы необоснованны</button></form>
+      <% } %>
+      <% if (ad.status !== 'rejected') { %>
+      <form method="post" action="/admin/ads/<%= ad.id %>/reject" class="reject-form"><input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="from" value="<%= status %>">
+        <input name="reason" placeholder="Причина (для себя)" maxlength="300">
+        <button class="btn btn--ghost btn--sm btn--block" type="submit">Отклонить</button></form>
+      <% } %>
+      <a class="btn btn--ghost btn--sm btn--block" href="/ru/ads/<%= ad.id %>" target="_blank">Предпросмотр</a>
+      <form method="post" action="/admin/ads/<%= ad.id %>/delete" data-confirm="Удалить объявление и фото безвозвратно?"><input type="hidden" name="_csrf" value="<%= csrf %>"><input type="hidden" name="from" value="<%= status %>">
+        <button class="btn btn--danger btn--sm btn--block" type="submit">Удалить (спам)</button></form>
+    </div>
+  </article>
+<% }) %>
+</div>
+<%- include('_foot') %>

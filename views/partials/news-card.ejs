@@ -1,0 +1,15 @@
+<article class="card news-card<%= item.is_important ? ' news-card--important' : '' %>">
+  <a class="news-card__media" href="<%= url('/news/' + item.id) %>" tabindex="-1" aria-hidden="true">
+    <% if (item.image) { %><img src="<%= item.image %>" alt="" loading="lazy" decoding="async"><% } else { %><span class="news-card__placeholder"><%- icon('megaphone') %></span><% } %>
+  </a>
+  <div class="news-card__body">
+    <div class="news-card__tags">
+      <span class="chip chip--soft"><%= t('news_kind_' + item.kind) %></span>
+      <% if (item.is_important) { %><span class="chip chip--alert"><%= t('news_important') %></span><% } %>
+      <% if (item.is_example) { %><span class="chip chip--example"><%= t('example_badge') %></span><% } %>
+    </div>
+    <h3 class="news-card__title"><a href="<%= url('/news/' + item.id) %>"><%= p(item, 'title') %></a></h3>
+    <p class="news-card__text"><%= excerpt(p(item, 'body'), 140) %></p>
+    <p class="meta"><%- icon('calendar') %><time datetime="<%= item.published_at.slice(0, 10) %>"><%= date(item.published_at) %></time></p>
+  </div>
+</article>

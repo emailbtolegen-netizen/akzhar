@@ -1,0 +1,88 @@
+<%
+  const v = (k) => values[k] == null ? '' : values[k];
+  const err = (k) => errors[k] ? `<p class="field__error" id="e-${k}">${escapeHtml(errors[k])}</p>` : '';
+  const inv = (k) => errors[k] ? ` aria-invalid="true" aria-describedby="e-${k}"` : '';
+%>
+<%- include('partials/head', { title: t('form_title'), description: t('form_lead') }) %>
+
+<div class="container form-wrap">
+  <a class="back-link" href="<%= url('/ads') %>"><%- icon('arrowLeft') %><%= t('ads_back') %></a>
+  <h1 class="page-title"><%= t('form_title') %></h1>
+  <p class="lead"><%= t('form_lead') %></p>
+
+  <% if (Object.keys(errors).length) { %>
+    <div class="notice notice--error" role="alert"><%- icon('alert') %><span><%= errors._form || t('form_error') %></span></div>
+  <% } %>
+
+  <form class="form card" method="post" action="<%= url('/ads/new') %>" enctype="multipart/form-data" novalidate data-ad-form>
+    <input type="hidden" name="ft" value="<%= formToken() %>">
+    <div class="hp" aria-hidden="true"><label>Website <input name="website" tabindex="-1" autocomplete="off"></label></div>
+
+    <div class="form-row">
+      <div class="field">
+        <label for="author_name"><%= t('form_name') %> <span class="req">*</span></label>
+        <input id="author_name" name="author_name" maxlength="60" required autocomplete="name" value="<%= v('author_name') %>"<%- inv('author_name') %>>
+        <%- err('author_name') %>
+      </div>
+      <div class="field">
+        <label for="phone"><%= t('form_phone') %> <span class="req">*</span></label>
+        <input id="phone" name="phone" type="tel" inputmode="tel" maxlength="20" required autocomplete="tel" placeholder="<%= t('form_phone_hint') %>" value="<%= v('phone') %>"<%- inv('phone') %>>
+        <%- err('phone') %>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="category_id"><%= t('form_category') %> <span class="req">*</span></label>
+      <select id="category_id" name="category_id" required data-price-toggle<%- inv('category_id') %>>
+        <option value=""><%= t('form_choose') %></option>
+        <% categories.forEach(function (c) { %><option value="<%= c.id %>" data-price="<%= c.has_price %>"<%= String(v('category_id')) === String(c.id) ? ' selected' : '' %>><%= p(c, 'name') %></option><% }) %>
+      </select>
+      <%- err('category_id') %>
+    </div>
+
+    <div class="field">
+      <label for="title"><%= t('form_ad_title') %> <span class="req">*</span></label>
+      <input id="title" name="title" maxlength="120" required placeholder="<%= t('form_ad_title_hint') %>" value="<%= v('title') %>"<%- inv('title') %>>
+      <%- err('title') %>
+    </div>
+
+    <div class="field">
+      <label for="description"><%= t('form_description') %> <span class="req">*</span></label>
+      <textarea id="description" name="description" rows="6" maxlength="4000" required<%- inv('description') %>><%= v('description') %></textarea>
+      <%- err('description') %>
+    </div>
+
+    <div class="form-row">
+      <div class="field" data-price-field>
+        <label for="price"><%= t('form_price') %></label>
+        <input id="price" name="price" inputmode="numeric" maxlength="15" value="<%= v('price') %>" aria-describedby="price-hint"<%- inv('price') %>>
+        <p class="field__hint" id="price-hint"><%= t('form_price_hint') %></p>
+        <%- err('price') %>
+      </div>
+      <div class="field">
+        <label for="duration"><%= t('form_duration') %></label>
+        <select id="duration" name="duration">
+          <% durations.forEach(function (d) { %><option value="<%= d %>"<%= String(v('duration') || 30) === String(d) ? ' selected' : '' %>><%= d %> <%= t('form_days') %></option><% }) %>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="photos"><%= t('form_photos') %></label>
+      <input id="photos" name="photos" type="file" accept="image/jpeg,image/png,image/webp" multiple data-photo-input aria-describedby="photos-hint"<%- inv('photos') %>>
+      <p class="field__hint" id="photos-hint"><%= t('form_photos_hint') %></p>
+      <div class="photo-preview" data-photo-preview></div>
+      <%- err('photos') %>
+    </div>
+
+    <label class="checkbox">
+      <input type="checkbox" name="agree" value="1" required<%= v('agree') ? ' checked' : '' %><%- inv('agree') %>>
+      <span><%= t('form_agree') %></span>
+    </label>
+    <%- err('agree') %>
+
+    <button class="btn btn--primary btn--lg" type="submit" data-submit><%- icon('check') %><%= t('form_submit') %></button>
+  </form>
+</div>
+
+<%- include('partials/foot') %>
