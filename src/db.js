@@ -163,6 +163,10 @@ CREATE TABLE IF NOT EXISTS messages (
 );
 `);
 
+// ---------- migrations for databases created by earlier versions ----------
+const columns = (table) => db.prepare(`PRAGMA table_info(${table})`).all().map((c) => c.name);
+if (!columns('messages').includes('topic')) db.exec(`ALTER TABLE messages ADD COLUMN topic TEXT NOT NULL DEFAULT ''`);
+
 // ---------- helpers ----------
 const all = (sql, ...p) => db.prepare(sql).all(...p);
 const get = (sql, ...p) => db.prepare(sql).get(...p);
@@ -192,8 +196,8 @@ function seed() {
     slogan_ru: 'Наш поселок — наша история, наше будущее',
     welcome_kk: 'Ақжар ауылының ақпараттық сайтына қош келдіңіз! Мұнда ауыл тарихымен танысып, қажетті телефон нөмірлерін тауып, жаңалықтарды оқып, хабарландыру бере аласыз.',
     welcome_ru: 'Добро пожаловать на информационный сайт поселка Акжар! Здесь можно узнать историю поселка, найти нужный телефон, прочитать новости и разместить объявление.',
-    region_kk: 'Атырау облысы, Қазақстан',
-    region_ru: 'Атырауская область, Казахстан',
+    region_kk: 'Атырау қаласы, Қазақстан',
+    region_ru: 'город Атырау, Казахстан',
     location_kk: '',
     location_ru: '',
     address_kk: '',
@@ -202,7 +206,7 @@ function seed() {
     contact_email: '',
     contact_hours_kk: '',
     contact_hours_ru: '',
-    whatsapp: '',
+    whatsapp: '87789705854', // all messages from the site's forms are sent to this WhatsApp number
     instagram: '',
     map_lat: '',
     map_lon: '',
@@ -250,8 +254,6 @@ function seed() {
     const groups = [
       ['main', 'Негізгі мекемелер', 'Основные учреждения'],
       ['utility', 'Коммуналдық қызметтер және байланыс', 'Коммунальные службы и связь'],
-      ['services', 'Шеберлер мен қызметтер', 'Мастера и услуги'],
-      ['food', 'Тамақ', 'Питание'],
     ];
     groups.forEach((g, i) => run('INSERT INTO phone_groups(slug, name_kk, name_ru, sort) VALUES(?,?,?,?)', ...g, i));
     const gid = (slug) => get('SELECT id FROM phone_groups WHERE slug = ?', slug).id;
@@ -269,20 +271,6 @@ function seed() {
       ['utility', 'Су арнасы — апаттық қызмет', 'Водоканал — аварийная служба', '', '', '87122760923', '87122760918', 'drop', 0],
       ['utility', 'Қазақтелеком', 'Казахтелеком', '', '', '160', '', 'wifi', 0],
       ['utility', 'Интернет мәселелері бойынша', 'По вопросам интернета', '', '', '87080000160', '', 'wifi', 0],
-      ['services', 'Нұрсылу — сынықшы', 'Нурсылу — костоправ (сынықшы)', 'Ақ-2', 'Ак-2', '87758815733', '', 'heart', 0],
-      ['services', 'Света — массаж', 'Света — массаж', '', '', '87751155362', '', 'heart', 0],
-      ['services', 'Света — бала емшісі', 'Света — детский лекарь (емші)', '', '', '87751155362', '', 'heart', 0],
-      ['services', 'Гүлмира — шаштараз', 'Гульмира — парикмахер', 'Ақ-2', 'Ак-2', '87789455062', '', 'scissors', 0],
-      ['services', 'Барбершоп', 'Барбершоп', '«Адал» дүкенінің жанында', 'Рядом с магазином «Адал»', '87022999789', '', 'scissors', 0],
-      ['services', 'Руслан — шиномонтаж', 'Руслан — шиномонтаж', '', '', '87022586045', '', 'tool', 0],
-      ['services', 'Аслан — электрик', 'Аслан — электрик', '', '', '87084808240', '', 'bolt', 0],
-      ['services', 'Құмар — электрик', 'Кумар — электрик', '', '', '87029528557', '', 'bolt', 0],
-      ['services', 'Асылбек — газ жөндеу', 'Асылбек — ремонт газового оборудования', '', '', '87785123079', '', 'flame', 0],
-      ['services', 'Алма — тігінші', 'Алма — швея', '', '', '87013401275', '', 'scissors', 0],
-      ['services', 'Бибігүл — тігінші', 'Бибигуль — швея', '', '', '87013971501', '', 'scissors', 0],
-      ['services', 'Абылайхан — ит жинаушы', 'Абылайхан — отлов бродячих собак', '', '', '87786020291', '', 'paw', 0],
-      ['food', 'Ақжар Фастфуд', 'Акжар Фастфуд', '', '', '87754622146', '', 'food', 0],
-      ['food', 'Guleke fast food', 'Guleke fast food', '', '', '87782082524', '', 'food', 0],
     ];
     phones.forEach((p, i) => run(
       'INSERT INTO phones(group_id, name_kk, name_ru, note_kk, note_ru, phone, phone2, icon, featured, sort) VALUES(?,?,?,?,?,?,?,?,?,?)',

@@ -1,9 +1,12 @@
 <%- include('partials/head', { title: t('news_title'), description: t('news_lead') }) %>
 
 <section class="page-hero">
-  <div class="container">
-    <h1 class="page-title"><%= t('news_title') %></h1>
-    <p class="lead"><%= t('news_lead') %></p>
+  <div class="container page-hero__row">
+    <div>
+      <h1 class="page-title"><%= t('news_title') %></h1>
+      <p class="lead"><%= t('news_lead') %></p>
+    </div>
+    <a class="btn btn--gold btn--lg" href="<%= url('/contacts') %>?topic=news#form"><%- icon('plus') %><%= t('news_suggest') %></a>
   </div>
 </section>
 

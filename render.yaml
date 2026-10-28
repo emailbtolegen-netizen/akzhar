@@ -1,0 +1,34 @@
+# Render Blueprint: dashboard.render.com → New → Blueprint → choose this GitHub repository.
+# Creates the web service with a persistent disk for the database and uploaded photos.
+services:
+  - type: web
+    name: akzhar
+    runtime: node
+    plan: starter            # a persistent disk needs a paid plan; the free plan would lose ads and photos on every restart
+    region: frankfurt        # closest Render region to Kazakhstan
+    buildCommand: npm ci --omit=dev
+    startCommand: node server.js
+    healthCheckPath: /healthz
+    disk:
+      name: akzhar-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_VERSION
+        value: "24"
+      - key: NODE_ENV
+        value: production
+      - key: TRUST_PROXY
+        value: "1"
+      - key: DATA_DIR
+        value: /var/data
+      - key: UPLOAD_DIR
+        value: /var/data/uploads
+      - key: APP_SECRET
+        generateValue: true
+      - key: ADMIN_USERNAME
+        value: admin
+      - key: ADMIN_PASSWORD   # entered once in the Render dashboard, at least 10 characters
+        sync: false
+      - key: SITE_URL         # e.g. https://akzhar.onrender.com or your own domain
+        sync: false

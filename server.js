@@ -13,7 +13,10 @@ const IS_PROD = process.env.NODE_ENV === 'production';
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-app.set('trust proxy', process.env.TRUST_PROXY || 'loopback');
+// Behind a hosting proxy (Render, Railway, Nginx) set TRUST_PROXY=1, otherwise every visitor
+// looks like the proxy's IP and the anti-spam limits would block everyone together.
+const trust = process.env.TRUST_PROXY;
+app.set('trust proxy', trust ? (/^\d+$/.test(trust) ? Number(trust) : trust) : 'loopback');
 app.disable('x-powered-by');
 
 // Case-insensitive search for Cyrillic/Kazakh text (SQLite LIKE only folds ASCII)
@@ -35,6 +38,9 @@ app.use((req, res, next) => {
   next();
 });
 
+// Health check for the hosting platform
+app.get('/healthz', (req, res) => res.type('text/plain').send('ok'));
+
 app.get('/', (req, res) => {
   const accept = String(req.get('accept-language') || '');
   const lang = /^ru/i.test(accept) && !/kk/i.test(accept) ? 'ru' : DEFAULT_LANG;
@@ -48,12 +54,23 @@ app.use('/:lang(kk|ru)', require('./src/routes/public'));
 app.use((req, res) => {
   const lang = LANGS.includes(req.path.split('/')[1]) ? req.path.split('/')[1] : DEFAULT_LANG;
   helpers.setLang(req, res, lang);
-  res.status(404).render('404');
+  res.status(404).render('404', { page: '404' });
 });
 
 app.use((err, req, res, _next) => {
   console.error(err);
   res.status(500).send('Внутренняя ошибка сервера / Сервердің ішкі қатесі');
 });
+
+// First administrator on a fresh server without a shell: ADMIN_USERNAME + ADMIN_PASSWORD
+// create the account once, only while the database has no users at all.
+const { get: dbGet, run: dbRun } = require('./src/db');
+if (process.env.ADMIN_USERNAME && process.env.ADMIN_PASSWORD && !dbGet('SELECT 1 FROM users LIMIT 1')) {
+  if (process.env.ADMIN_PASSWORD.length < 10) console.warn('ADMIN_PASSWORD is shorter than 10 characters — admin not created');
+  else {
+    dbRun(`INSERT INTO users(username, password_hash, role) VALUES(?, ?, 'admin')`, process.env.ADMIN_USERNAME, require('./src/security').hashPassword(process.env.ADMIN_PASSWORD));
+    console.log(`Admin "${process.env.ADMIN_USERNAME}" created from environment variables`);
+  }
+}
 
 app.listen(PORT, () => console.log(`Akzhar site: http://localhost:${PORT}`));

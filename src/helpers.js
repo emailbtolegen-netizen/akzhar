@@ -52,6 +52,25 @@ function excerpt(text, n = 160) {
   return s.length > n ? s.slice(0, n).replace(/\s+\S*$/, '') + '…' : s;
 }
 
+// Responsive images: if smaller copies exist next to the file (name-480.jpg, name-960.jpg,
+// made by `npm run media`), return srcset/sizes so phones download the small one.
+const fs = require('node:fs');
+const path = require('node:path');
+const PUBLIC = path.join(__dirname, '..', 'public');
+const variantCache = new Map();
+function respImg(url, sizes = '100vw') {
+  const u = String(url || '');
+  if (!u.startsWith('/media/') || !u.endsWith('.jpg')) return '';
+  if (!variantCache.has(u)) {
+    const base = u.slice(0, -4);
+    const found = [480, 960].filter((w) => fs.existsSync(path.join(PUBLIC, `${base}-${w}.jpg`)));
+    const full = /hero-poster/.test(u) ? 1280 : 1600;
+    variantCache.set(u, found.length ? [...found.map((w) => `${base}-${w}.jpg ${w}w`), `${u} ${full}w`].join(', ') : '');
+  }
+  const set = variantCache.get(u);
+  return set ? ` srcset="${set}" sizes="${sizes}"` : '';
+}
+
 function icon(name, cls = '') {
   return `<svg class="icon ${cls}" aria-hidden="true" viewBox="0 0 24 24">${icons[name] || icons.dot}</svg>`;
 }
@@ -70,4 +89,4 @@ function setLang(req, res, lang) {
   });
 }
 
-module.exports = { escapeHtml, paragraphs, phoneDisplay, phoneHref, whatsappHref, formatPrice, embedUrl, excerpt, icon, setLang, digits };
+module.exports = { escapeHtml, paragraphs, phoneDisplay, phoneHref, whatsappHref, formatPrice, embedUrl, excerpt, icon, setLang, digits, respImg };

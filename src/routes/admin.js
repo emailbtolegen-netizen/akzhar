@@ -407,7 +407,7 @@ const SETTINGS_FORM = [
     { pair: [{ name: 'address_kk', label: 'Адрес (ҚАЗ)' }, { name: 'address_ru', label: 'Адрес (РУС)' }] },
     { pair: [{ name: 'contact_phone', label: 'Телефон для связи' }, { name: 'contact_email', label: 'E-mail' }] },
     { pair: [{ name: 'contact_hours_kk', label: 'Время работы (ҚАЗ)' }, { name: 'contact_hours_ru', label: 'Время работы (РУС)' }] },
-    { pair: [{ name: 'whatsapp', label: 'WhatsApp (номер)' }, { name: 'instagram', label: 'Instagram (ссылка)' }] },
+    { pair: [{ name: 'whatsapp', label: 'WhatsApp для сообщений с сайта', hint: 'На этот номер приходят объявления, сообщения, исправления и жалобы. Например 87789705854' }, { name: 'instagram', label: 'Instagram (ссылка)' }] },
   ] },
   { group: 'Карта', fields: [
     { pair: [{ name: 'map_lat', label: 'Широта', hint: 'Например 47.1234 — скопируйте из 2GIS/Google Maps/OpenStreetMap' }, { name: 'map_lon', label: 'Долгота', hint: 'Например 51.5678' }] },

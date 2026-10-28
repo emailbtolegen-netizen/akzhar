@@ -12,7 +12,7 @@
 <html lang="<%= lang %>">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title><%= fullTitle %></title>
 <meta name="description" content="<%= excerpt(desc, 180) %>">
 <link rel="canonical" href="<%= baseUrl %>/<%= lang %><%= pathNoLang === '/' ? '' : pathNoLang %>">
@@ -24,17 +24,35 @@
 <meta property="og:description" content="<%= excerpt(desc, 180) %>">
 <meta property="og:image" content="<%= ogImage && ogImage.startsWith('http') ? ogImage : baseUrl + ogImage %>">
 <meta property="og:locale" content="<%= lang === 'kk' ? 'kk_KZ' : 'ru_RU' %>">
-<meta name="theme-color" content="#1f5f6e">
+<meta name="theme-color" content="#04202b">
+<%# Phone numbers are already links: stop iOS from re-styling digits in plain text %>
+<meta name="format-detection" content="telephone=no">
+<%# "Add to home screen": opens like an app, the phones page works offline (public/sw.js) %>
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="<%= siteName %>">
+<link rel="apple-touch-icon" href="/img/icon-180.png">
 <link rel="icon" href="/img/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@500;600;700&display=swap&subset=cyrillic-ext">
-<link rel="stylesheet" href="/css/style.css?v=1">
-<script src="/js/main.js?v=1" defer></script>
+<link rel="stylesheet" href="/css/style.css?v=8">
+<script src="/js/main.js?v=5" defer></script>
 <% if (typeof jsonLd !== 'undefined' && jsonLd) { %><script type="application/ld+json"><%- JSON.stringify(jsonLd).replace(/</g, '\\u003c') %></script><% } %>
 </head>
 <body class="page-<%= page %>">
 <a class="skip-link" href="#main"><%= t('skip_to_content') %></a>
+<%# Site-wide background: the drone video of Akzhar, fixed behind every page.
+    The poster shows immediately; main.js starts the video only on good connections. %>
+<div class="bg-media" aria-hidden="true">
+  <img class="bg-media__poster" src="<%= settings.hero_poster %>"<%- respImg(settings.hero_poster, '100vw') %> alt="" decoding="async"<% if (transparent) { %> fetchpriority="high"<% } %>>
+  <% if (settings.hero_video) { %>
+  <video class="bg-media__video" data-bg-video muted loop playsinline preload="none"
+         data-src="<%= settings.hero_video %>" data-src-mobile="<%= settings.hero_video_mobile || settings.hero_video %>"></video>
+  <% } %>
+</div>
 <header class="site-header<%= transparent ? ' is-transparent' : '' %>" data-header>
   <div class="container header-inner">
     <a class="brand" href="<%= url() %>" aria-label="<%= t('site_title') %>">
@@ -50,8 +68,19 @@
       <div class="lang-switch lang-switch--menu" role="group" aria-label="Тіл / Язык">
         <% altLangs.forEach(function (l) { %><a href="<%= l.href %>" hreflang="<%= l.code %>" lang="<%= l.code %>"<% if (l.active) { %> aria-current="true"<% } %>><%= l.code === 'kk' ? 'ҚАЗ' : 'РУС' %></a><% }) %>
       </div>
+      <% if (settings.hero_video) { %>
+      <%# On phones the background-video pause lives here instead of a floating button over the content %>
+      <button class="menu-bg-toggle" type="button" data-bg-toggle hidden
+              data-label-pause="<%= t('hero_pause') %>" data-label-play="<%= t('hero_play') %>" aria-label="<%= t('hero_pause') %>">
+        <%- icon('pause', 'icon-pause') %><%- icon('play', 'icon-play') %><span data-bg-toggle-label><%= t('hero_pause') %></span>
+      </button>
+      <% } %>
     </nav>
     <div class="header-actions">
+      <%# Narrow phones: one tap switches to the other language %>
+      <% altLangs.filter(function (l) { return !l.active; }).forEach(function (l) { %>
+      <a class="lang-quick" href="<%= l.href %>" hreflang="<%= l.code %>" lang="<%= l.code %>" aria-label="<%= l.code === 'kk' ? 'Қазақша' : 'Русский' %>"><%= l.code === 'kk' ? 'ҚАЗ' : 'РУС' %></a>
+      <% }) %>
       <div class="lang-switch" role="group" aria-label="Тіл / Язык">
         <% altLangs.forEach(function (l) { %><a href="<%= l.href %>" hreflang="<%= l.code %>" lang="<%= l.code %>"<% if (l.active) { %> aria-current="true"<% } %>><%= l.code === 'kk' ? 'ҚАЗ' : 'РУС' %></a><% }) %>
       </div>

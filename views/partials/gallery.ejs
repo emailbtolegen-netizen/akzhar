@@ -1,7 +1,7 @@
 <div class="gallery" data-gallery>
   <% photos.forEach(function (ph, i) { const cap = p(ph, 'title'); %>
   <a class="gallery__item<%= i === 0 && typeof wide !== 'undefined' && wide ? ' gallery__item--wide' : '' %>" href="<%= ph.file || ph.url %>" data-caption="<%= cap %><%= ph.year_label ? ' · ' + ph.year_label : '' %>">
-    <img src="<%= ph.file || ph.url %>" alt="<%= cap %>" loading="lazy" decoding="async">
+    <img src="<%= ph.file || ph.url %>"<%- respImg(ph.file, i === 0 && typeof wide !== 'undefined' && wide ? '(min-width: 768px) 50vw, 82vw' : '(min-width: 768px) 25vw, (min-width: 480px) 60vw, 82vw') %> alt="<%= cap %>" loading="lazy" decoding="async">
     <% if (ph.year_label) { %><span class="gallery__year"><%= ph.year_label %></span><% } %>
   </a>
   <% }) %>

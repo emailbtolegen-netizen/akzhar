@@ -21,7 +21,7 @@
   <p class="meta"><%- icon('calendar') %><time datetime="<%= item.published_at.slice(0, 10) %>"><%= date(item.published_at) %></time></p>
   <% if (item.is_example) { %><p class="notice notice--example"><%- icon('info') %><%= t('example_note') %></p><% } %>
   <% if (!item['body_' + lang]) { %><p class="notice"><%- icon('info') %><%= t('no_translation') %></p><% } %>
-  <% if (item.image) { %><img class="article__image" src="<%= item.image %>" alt="" decoding="async"><% } %>
+  <% if (item.image) { %><img class="article__image" src="<%= item.image %>"<%- respImg(item.image, '(min-width: 860px) 820px, 100vw') %> alt="" decoding="async"><% } %>
   <div class="prose"><%- paragraphs(body) %></div>
   <%- include('partials/share', { shareTitle: title }) %>
 </article>

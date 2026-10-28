@@ -1,6 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
-  <circle cx="24" cy="24" r="22" fill="#1f5f6e"/>
-  <circle cx="24" cy="24" r="15.5" stroke="#c8963a" stroke-width="2.2"/>
+  <!-- Shanyrak (yurt crown) in sky blue and sun gold -->
+  <circle cx="24" cy="24" r="22" fill="#0b6f8a"/>
+  <circle cx="24" cy="24" r="15.5" stroke="#f0b23a" stroke-width="2.4"/>
   <g stroke="#fff" stroke-width="2" stroke-linecap="round">
     <path d="M14 15.5c4 3 4 14 0 17M19 10.5c2.5 5 2.5 22 0 27M29 10.5c-2.5 5-2.5 22 0 27M34 15.5c-4 3-4 14 0 17"/>
     <path d="M15.5 14c3 4 14 4 17 0M10.5 19c5 2.5 22 2.5 27 0M10.5 29c5-2.5 22-2.5 27 0M15.5 34c3-4 14-4 17 0"/>

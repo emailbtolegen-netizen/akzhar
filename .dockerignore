@@ -1,0 +1,10 @@
+node_modules
+data
+uploads
+backups
+.git
+*.MP4
+!public/media/*.mp4
+*.docx
+WhatsApp Image*
+.env

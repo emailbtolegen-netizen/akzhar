@@ -3,7 +3,7 @@
 <div class="mod-list">
   <% messages.forEach(function (m) { %>
   <article class="card msg<%= m.is_read ? '' : ' msg--new' %>">
-    <p class="meta"><%= m.created_at %> UTC<%= m.is_read ? '' : ' · новое' %></p>
+    <p class="meta"><%= m.created_at %> UTC<%= m.is_read ? '' : ' · новое' %><% if (m.topic) { %> · <%= ({ question: 'Вопрос или предложение', news: 'Предложение новости', correction: 'Исправление', history: 'Материал по истории', other: 'Другое' })[m.topic] || m.topic %><% } %></p>
     <h2><%= m.name %><% if (m.contact) { %> · <span class="muted"><%= m.contact %></span><% } %></h2>
     <div class="prose"><%- paragraphs(m.text) %></div>
     <div class="btn-row btn-row--left">

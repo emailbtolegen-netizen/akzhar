@@ -1,6 +1,6 @@
 <article class="card news-card<%= item.is_important ? ' news-card--important' : '' %>">
   <a class="news-card__media" href="<%= url('/news/' + item.id) %>" tabindex="-1" aria-hidden="true">
-    <% if (item.image) { %><img src="<%= item.image %>" alt="" loading="lazy" decoding="async"><% } else { %><span class="news-card__placeholder"><%- icon('megaphone') %></span><% } %>
+    <% if (item.image) { %><img src="<%= item.image %>"<%- respImg(item.image, '(min-width: 1024px) 33vw, (min-width: 560px) 50vw, 100vw') %> alt="" loading="lazy" decoding="async"><% } else { %><span class="news-card__placeholder"><%- icon('megaphone') %></span><% } %>
   </a>
   <div class="news-card__body">
     <div class="news-card__tags">

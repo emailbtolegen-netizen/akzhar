@@ -1,7 +1,7 @@
 const express = require('express');
 const { all, get, run, tx, getSettings } = require('../db');
 const { t } = require('../i18n');
-const { setLang, digits } = require('../helpers');
+const { setLang, digits, whatsappHref, phoneDisplay, formatPrice } = require('../helpers');
 const { formToken, checkFormToken, honeypotFilled, ipHash, rateLimit } = require('../security');
 const { adPhotos, store, IMAGE_TYPES } = require('../uploads');
 
@@ -10,6 +10,21 @@ const PAGE_SIZE = 12;
 const NEWS_KINDS = ['news', 'event', 'sport', 'outage', 'roads', 'notice'];
 const REPORT_REASONS = ['spam', 'fraud', 'false', 'offensive', 'outdated', 'other'];
 const AD_DURATIONS = [7, 14, 30, 60];
+const MESSAGE_TOPICS = ['question', 'news', 'correction', 'history', 'other'];
+
+// Every form submission is also forwarded to the site owner's WhatsApp (settings.whatsapp).
+// There is no free way to send a WhatsApp/SMS message from the server, so after saving
+// the visitor gets a wa.me link with the text already filled in and presses "Send".
+function whatsappPage(res, { text, backUrl, backLabel, photos = false, key }) {
+  const settings = getSettings();
+  const base = whatsappHref(settings.whatsapp);
+  res.render('wa-sent', {
+    page: res.locals.page || 'contacts',
+    waUrl: base ? `${base}?text=${encodeURIComponent(text)}` : '',
+    backUrl, backLabel, photos, waKey: key,
+  });
+}
+const lines = (...rows) => rows.filter((r) => r !== null && r !== undefined && r !== '').join('\n');
 
 router.use((req, res, next) => {
   setLang(req, res, req.params.lang);
@@ -166,7 +181,28 @@ router.post('/ads/new', rateLimit({ windowMs: 10 * 60 * 1000, max: 10 }), (req, 
         }
         return adId;
       });
-      res.render('ad-sent', { page: 'ads', auto, id });
+      const lang = req.params.lang;
+      const price = category.has_price && priceRaw ? formatPrice(Number(priceRaw)) : tr('ads_price_negotiable');
+      res.locals.page = 'ads';
+      whatsappPage(res, {
+        key: `ad-${id}`,
+        photos: true,
+        backUrl: `/${lang}/ads`, backLabel: tr('ads_back'),
+        text: lines(
+          `📢 ${tr('wa_new_ad')} #${id}`,
+          '',
+          `*${title}*`,
+          `${tr('ads_category')}: ${category['name_' + lang]}`,
+          `${tr('ads_price')}: ${price}`,
+          `${tr('ads_author')}: ${name}, ${phoneDisplay(normalizedPhone)}`,
+          `${tr('form_duration')}: ${duration} ${tr('form_days')}`,
+          files.length ? `${tr('wa_photos_count')}: ${files.length}` : null,
+          '',
+          description,
+          '',
+          `${tr('wa_check')}: ${res.locals.baseUrl}/admin/ads${auto ? '?status=approved' : ''}`,
+        ),
+      });
     } catch (e) {
       if (e.userMessage) return adForm(res, values, { photos: e.userMessage }, 400);
       next(e);
@@ -189,19 +225,31 @@ router.get('/ads/:id(\\d+)', (req, res, next) => {
 });
 
 router.post('/ads/:id(\\d+)/report', rateLimit({ windowMs: 3600 * 1000, max: 10 }), (req, res, next) => {
-  const ad = get(`SELECT id FROM ads WHERE id = ? AND status = 'approved'`, Number(req.params.id));
+  const ad = get(`SELECT id, title FROM ads WHERE id = ? AND status = 'approved'`, Number(req.params.id));
   if (!ad) return next();
+  const tr = t(req.params.lang);
   const back = `/${req.params.lang}/ads/${ad.id}`;
   if (honeypotFilled(req.body) || !checkFormToken(req.body.ft, 2)) return res.redirect(back);
   const reason = REPORT_REASONS.includes(req.body.reason) ? req.body.reason : 'other';
+  const comment = String(req.body.comment || '').trim().slice(0, 500);
   const ip = ipHash(req);
-  if (!get('SELECT 1 FROM ad_reports WHERE ad_id = ? AND ip_hash = ?', ad.id, ip)) {
-    run('INSERT INTO ad_reports(ad_id, reason, comment, ip_hash) VALUES(?,?,?,?)', ad.id, reason, String(req.body.comment || '').slice(0, 500), ip);
-    // Three independent complaints hide the ad until a moderator looks at it.
-    const n = get('SELECT COUNT(*) AS n FROM ad_reports WHERE ad_id = ? AND resolved = 0', ad.id).n;
-    if (n >= 3) run(`UPDATE ads SET status = 'pending' WHERE id = ?`, ad.id);
-  }
-  res.redirect(back + '?reported=1');
+  if (get('SELECT 1 FROM ad_reports WHERE ad_id = ? AND ip_hash = ?', ad.id, ip)) return res.redirect(back + '?reported=1');
+  run('INSERT INTO ad_reports(ad_id, reason, comment, ip_hash) VALUES(?,?,?,?)', ad.id, reason, comment, ip);
+  // Three independent complaints hide the ad until a moderator looks at it.
+  const n = get('SELECT COUNT(*) AS n FROM ad_reports WHERE ad_id = ? AND resolved = 0', ad.id).n;
+  if (n >= 3) run(`UPDATE ads SET status = 'pending' WHERE id = ?`, ad.id);
+  res.locals.page = 'ads';
+  whatsappPage(res, {
+    key: `report-${ad.id}`,
+    backUrl: back, backLabel: tr('ads_back'),
+    text: lines(
+      `⚠️ ${tr('wa_new_report')} #${ad.id}`,
+      `«${ad.title}»`,
+      `${tr('ads_report_reason')}: ${tr('ads_report_' + reason)}`,
+      comment ? `${tr('ads_report_comment').replace(/\s*\(.*\)$/, '')}: ${comment}` : null,
+      `${res.locals.baseUrl}${back}`,
+    ),
+  });
 });
 
 // ---------- News ----------
@@ -238,8 +286,12 @@ router.get('/about', (req, res) => {
 });
 
 // ---------- Contacts ----------
+// ?topic=news|correction|history pre-selects the subject (links from the news, phones and history pages)
+const contactsPage = (res, values, errors, status = 200) =>
+  res.status(status).render('contacts', { page: 'contacts', values, errors, topics: MESSAGE_TOPICS, sent: false });
+
 router.get('/contacts', (req, res) => {
-  res.render('contacts', { page: 'contacts', values: {}, errors: {}, sent: req.query.sent === '1' });
+  contactsPage(res, { topic: MESSAGE_TOPICS.includes(req.query.topic) ? req.query.topic : 'question' }, {});
 });
 
 router.post('/contacts', rateLimit({ windowMs: 3600 * 1000, max: 5 }), (req, res) => {
@@ -252,9 +304,23 @@ router.post('/contacts', rateLimit({ windowMs: 3600 * 1000, max: 5 }), (req, res
   if (!name) errors.name = tr('err_required');
   if (!text) errors.text = tr('err_required');
   else if (text.length > 3000) errors.text = tr('err_too_long');
-  if (Object.keys(errors).length) return res.status(400).render('contacts', { page: 'contacts', values, errors, sent: false });
-  run('INSERT INTO messages(name, contact, text, ip_hash) VALUES(?,?,?,?)', name.slice(0, 80), String(values.contact || '').slice(0, 120), text, ipHash(req));
-  res.redirect(`/${req.params.lang}/contacts?sent=1#form`);
+  if (Object.keys(errors).length) return contactsPage(res, values, errors, 400);
+  const topic = MESSAGE_TOPICS.includes(values.topic) ? values.topic : 'question';
+  const contact = String(values.contact || '').trim().slice(0, 120);
+  const r = run('INSERT INTO messages(name, contact, text, topic, ip_hash) VALUES(?,?,?,?,?)', name.slice(0, 80), contact, text, topic, ipHash(req));
+  whatsappPage(res, {
+    key: `msg-${r.lastInsertRowid}`,
+    photos: topic === 'news' || topic === 'history',
+    backUrl: `/${req.params.lang}`, backLabel: tr('to_home'),
+    text: lines(
+      `✉️ ${tr('wa_new_msg')}`,
+      `${tr('contacts_topic')}: ${tr('topic_' + topic)}`,
+      `${tr('contacts_your_name')}: ${name.slice(0, 80)}`,
+      contact ? `${tr('contacts_phone')}: ${contact}` : null,
+      '',
+      text,
+    ),
+  });
 });
 
 module.exports = router;

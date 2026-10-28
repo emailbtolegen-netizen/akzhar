@@ -1,6 +1,5 @@
 </main>
 <footer class="site-footer">
-  <div class="ornament-band" aria-hidden="true"></div>
   <div class="container footer-grid">
     <div class="footer-brand">
       <a class="brand brand--light" href="<%= url() %>">
@@ -39,8 +38,25 @@
   <div class="container footer-bottom">
     <span>© <%= new Date().getFullYear() %> <%= t('site_title') %>. <%= t('footer_rights') %>.</span>
     <span><%= t('footer_disclaimer') %></span>
-    <a href="/admin"><%= t('footer_admin') %></a>
+    <span class="footer-dev"><%= t('footer_dev') %>: <a href="https://weblink-app.vercel.app/" target="_blank" rel="noopener">weblink-app.vercel.app</a></span>
   </div>
 </footer>
+
+<%# Pause/play for the moving background (WCAG 2.2.2). Shown by main.js once the video plays. %>
+<% if (settings.hero_video) { %>
+<button class="bg-toggle" type="button" data-bg-toggle hidden
+        data-label-pause="<%= t('hero_pause') %>" data-label-play="<%= t('hero_play') %>" aria-label="<%= t('hero_pause') %>" title="<%= t('hero_pause') %>">
+  <%- icon('pause', 'icon-pause') %><%- icon('play', 'icon-play') %>
+</button>
+<% } %>
+
+<%# Bottom tab bar: phones and tablets only (hidden from 1024px by CSS). Thumb-reachable access to the main sections. %>
+<nav class="tabbar" aria-label="<%= t('menu') %>">
+  <a class="tabbar__item" href="<%= url() %>"<% if (page === 'home') { %> aria-current="page"<% } %>><%- icon('home') %><span><%= t('tab_home') %></span></a>
+  <a class="tabbar__item" href="<%= url('/phones') %>"<% if (page === 'phones') { %> aria-current="page"<% } %>><%- icon('phone') %><span><%= t('tab_phones') %></span></a>
+  <a class="tabbar__item tabbar__item--main" href="<%= url('/ads') %>"<% if (page === 'ads') { %> aria-current="page"<% } %>><%- icon('megaphone') %><span><%= t('tab_ads') %></span></a>
+  <a class="tabbar__item" href="<%= url('/news') %>"<% if (page === 'news') { %> aria-current="page"<% } %>><%- icon('calendar') %><span><%= t('tab_news') %></span></a>
+  <button class="tabbar__item" type="button" aria-expanded="false" aria-controls="main-nav" data-menu-toggle><%- icon('menu') %><span><%= t('tab_menu') %></span></button>
+</nav>
 </body>
 </html>

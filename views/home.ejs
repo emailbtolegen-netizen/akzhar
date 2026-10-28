@@ -3,20 +3,14 @@
   const jsonLd = {
     '@context': 'https://schema.org', '@type': 'Place',
     name: p(settings, 'site_name'), description: p(settings, 'welcome'),
-    address: { '@type': 'PostalAddress', addressRegion: lang === 'kk' ? 'Атырау облысы' : 'Атырауская область', addressCountry: 'KZ' },
+    address: { '@type': 'PostalAddress', addressLocality: lang === 'kk' ? 'Атырау қаласы' : 'город Атырау', addressCountry: 'KZ' },
     url: baseUrl + '/' + lang,
   };
 %>
 <%- include('partials/head', { title: '', heroHeader: true, jsonLd }) %>
 
 <section class="hero" data-hero>
-  <div class="hero__media">
-    <img class="hero__poster" src="<%= settings.hero_poster %>" alt="" fetchpriority="high" decoding="async">
-    <% if (settings.hero_video) { %>
-    <video class="hero__video" data-hero-video muted loop playsinline preload="none" aria-hidden="true"
-           data-src="<%= settings.hero_video %>" data-src-mobile="<%= settings.hero_video_mobile || settings.hero_video %>"></video>
-    <% } %>
-  </div>
+  <%# The video itself is the site-wide background (partials/head.ejs); the hero only adds a shade. %>
   <div class="hero__shade" aria-hidden="true"></div>
   <div class="container hero__content">
     <p class="hero__region"><%- icon('pin') %><%= p(settings, 'region') %></p>
@@ -32,12 +26,6 @@
     </div>
   </div>
   <div class="hero__controls">
-    <% if (settings.hero_video) { %>
-    <button class="hero__ctrl" type="button" data-hero-toggle hidden
-            data-label-pause="<%= t('hero_pause') %>" data-label-play="<%= t('hero_play') %>" aria-label="<%= t('hero_pause') %>">
-      <%- icon('pause', 'icon-pause') %><%- icon('play', 'icon-play') %>
-    </button>
-    <% } %>
     <% if (settings.full_video || embed) { %>
     <button class="hero__ctrl" type="button" data-open-video aria-label="<%= t('hero_sound_on') %>" title="<%= t('hero_sound_on') %>"><%- icon('volume') %></button>
     <% } %>
@@ -120,7 +108,7 @@
   </div>
 </section>
 
-<section class="section section--tinted" aria-labelledby="latest-news">
+<section class="section section--sand" aria-labelledby="latest-news">
   <div class="container">
     <div class="section-head">
       <h2 class="section-title" id="latest-news"><%= t('home_latest_news') %></h2>
@@ -137,9 +125,7 @@
 <section class="section" aria-labelledby="history-teaser">
   <div class="container history-teaser">
     <div class="history-teaser__media">
-      <img src="<%= photos[0] ? (photos[0].file || photos[0].url) : settings.hero_poster %>" alt="" loading="lazy">
-      <span class="history-teaser__ornament" aria-hidden="true"></span>
-    </div>
+      <% const teaser = photos[0] ? (photos[0].file || photos[0].url) : settings.hero_poster; %><img src="<%= teaser %>"<%- respImg(teaser, '(min-width: 768px) 50vw, 100vw') %> alt="" loading="lazy" decoding="async">    </div>
     <div class="history-teaser__text">
       <p class="eyebrow"><%= t('nav_history') %></p>
       <h2 class="section-title" id="history-teaser"><%= t('home_history_title') %></h2>

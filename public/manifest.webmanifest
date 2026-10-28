@@ -1,0 +1,21 @@
+{
+  "name": "Ақжар — ауыл сайты / Сайт поселка Акжар",
+  "short_name": "Ақжар",
+  "description": "Ақжар ауылының ақпараттық сайты: телефондар, хабарландырулар, жаңалықтар. Информационный сайт поселка Акжар.",
+  "lang": "kk",
+  "start_url": "/kk",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#04202b",
+  "theme_color": "#04202b",
+  "icons": [
+    { "src": "/img/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/img/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/img/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Пайдалы телефондар / Телефоны", "short_name": "Телефондар", "url": "/kk/phones", "icons": [{ "src": "/img/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Хабарландырулар / Объявления", "short_name": "Хабарландыру", "url": "/kk/ads", "icons": [{ "src": "/img/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

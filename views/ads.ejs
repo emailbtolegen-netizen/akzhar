@@ -15,7 +15,7 @@
     <div class="filters__search">
       <%- icon('search') %>
       <label class="visually-hidden" for="q"><%= t('ads_search') %></label>
-      <input id="q" name="q" type="search" value="<%= q %>" placeholder="<%= t('ads_search') %>">
+      <input id="q" name="q" type="search" enterkeyhint="search" value="<%= q %>" placeholder="<%= t('ads_search') %>">
     </div>
     <label class="visually-hidden" for="cat"><%= t('ads_category') %></label>
     <select id="cat" name="cat" data-autosubmit>

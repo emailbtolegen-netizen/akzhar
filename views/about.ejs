@@ -3,7 +3,7 @@
   const hasMap = Number.isFinite(lat) && Number.isFinite(lon);
   const d = 0.025;
   const mapSrc = hasMap ? `https://www.openstreetmap.org/export/embed.html?bbox=${lon - d * 1.6},${lat - d},${lon + d * 1.6},${lat + d}&layer=mapnik&marker=${lat},${lon}` : '';
-  const mapLink = hasMap ? `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=14/${lat}/${lon}` : `https://www.openstreetmap.org/search?query=${encodeURIComponent('Ақжар, Атырау облысы')}`;
+  const mapLink = hasMap ? `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=14/${lat}/${lon}` : `https://www.openstreetmap.org/search?query=${encodeURIComponent('Ақжар, Атырау')}`;
 %>
 <%- include('partials/head', { title: t('about_title'), description: t('about_lead') }) %>
 
@@ -75,7 +75,7 @@
     <div class="card-grid card-grid--3">
       <% places.forEach(function (pl) { %>
       <article class="card place-card">
-        <% if (pl.image) { %><img src="<%= pl.image %>" alt="" loading="lazy"><% } %>
+        <% if (pl.image) { %><img src="<%= pl.image %>"<%- respImg(pl.image, '(min-width: 1024px) 33vw, (min-width: 560px) 50vw, 100vw') %> alt="" loading="lazy" decoding="async"><% } %>
         <div class="place-card__body"><h3><%= p(pl, 'name') %></h3><div class="prose"><%- paragraphs(p(pl, 'text')) %></div></div>
       </article>
       <% }) %>

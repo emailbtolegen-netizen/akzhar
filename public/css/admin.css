@@ -1,5 +1,7 @@
 /* Admin panel — builds on the tokens and components of style.css */
-body.admin { background: #f3f1ec; font-size: 1rem; }
+body.admin { background: #f3f1ec; font-size: 1rem; padding-bottom: 0; }
+.admin .form [type="submit"] { width: auto; }
+@media (max-width: 639px) { .admin .form [type="submit"] { width: 100%; } }
 .admin-top { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 16px; padding: 10px 20px; background: #17302f; color: #fff; }
 .admin-brand { display: flex; align-items: center; gap: 10px; color: #fff; text-decoration: none; font-weight: 700; }
 .admin-brand:hover { color: #fff; }

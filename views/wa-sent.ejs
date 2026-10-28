@@ -1,0 +1,18 @@
+<%# After any form: the submission is saved, and the visitor forwards it to the site owner's WhatsApp
+    (settings.whatsapp). main.js opens the link automatically once; the big button is the fallback. %>
+<%- include('partials/head', { title: t('wa_title') }) %>
+<div class="container form-wrap">
+  <div class="empty-state empty-state--ok wa-sent">
+    <%- icon('whatsapp') %>
+    <h1><%= t('wa_title') %></h1>
+    <p><%= t('wa_text') %></p>
+    <% if (photos) { %><p class="wa-sent__hint"><%- icon('image') %><%= t('wa_photos') %></p><% } %>
+    <div class="btn-row">
+      <% if (waUrl) { %>
+      <a class="btn btn--whatsapp btn--lg" href="<%= waUrl %>" target="_blank" rel="noopener" data-wa-auto data-wa-key="<%= waKey %>" data-wa-opening="<%= t('wa_opening') %>"><%- icon('whatsapp') %><%= t('wa_button') %></a>
+      <% } %>
+      <a class="btn btn--ghost" href="<%= backUrl %>"><%= backLabel %></a>
+    </div>
+  </div>
+</div>
+<%- include('partials/foot') %>

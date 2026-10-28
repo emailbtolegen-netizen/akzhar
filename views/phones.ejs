@@ -24,7 +24,7 @@
   <div class="phone-search">
     <label class="visually-hidden" for="phone-q"><%= t('phones_search') %></label>
     <%- icon('search') %>
-    <input id="phone-q" type="search" placeholder="<%= t('phones_search') %>" autocomplete="off" data-phone-search>
+    <input id="phone-q" type="search" enterkeyhint="search" placeholder="<%= t('phones_search') %>" autocomplete="off" data-phone-search>
   </div>
 
   <% groups.forEach(function (g) { %>
@@ -39,7 +39,7 @@
 
   <div class="cta-card cta-card--soft">
     <div><h2><%= t('phones_check_note') %></h2></div>
-    <a class="btn btn--primary" href="<%= url('/contacts') %>#form"><%- icon('mail') %><%= t('phones_report_btn') %></a>
+    <a class="btn btn--primary" href="<%= url('/contacts') %>?topic=correction#form"><%- icon('mail') %><%= t('phones_report_btn') %></a>
   </div>
 </div>
 

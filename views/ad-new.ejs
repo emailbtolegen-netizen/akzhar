@@ -48,7 +48,7 @@
 
     <div class="field">
       <label for="description"><%= t('form_description') %> <span class="req">*</span></label>
-      <textarea id="description" name="description" rows="6" maxlength="4000" required<%- inv('description') %>><%= v('description') %></textarea>
+      <textarea id="description" name="description" rows="6" autocapitalize="sentences" maxlength="4000" required<%- inv('description') %>><%= v('description') %></textarea>
       <%- err('description') %>
     </div>
 
